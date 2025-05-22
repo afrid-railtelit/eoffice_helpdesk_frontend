@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { MdVerified } from "react-icons/md";
 import { GrCircleAlert } from "react-icons/gr";
-import ReportsTableActions from "./reportsTableActions";
+import ReportsTableActions from "./TicketsTableActions";
 
 export type HelpdeskTicket = {
   sNo: number;
@@ -24,7 +24,7 @@ export type HelpdeskTicket = {
   remarks: string | null;
 };
 
-export const reportColumns: ColumnDef<HelpdeskTicket>[] = [
+export const ticketsColumns: ColumnDef<HelpdeskTicket>[] = [
   { accessorKey: "sNo", header: "S No" },
   { accessorKey: "docketNumber", header: "Docket Number" },
   // { accessorKey: "zone", header: "ZONE" },
@@ -73,13 +73,13 @@ export const reportColumns: ColumnDef<HelpdeskTicket>[] = [
   { accessorKey: "startTime", header: "Start Time" },
   { accessorKey: "endDate", header: "End Date" },
   { accessorKey: "endTime", header: "End Time" },
-  // {
-  //   accessorKey: "actions",
-  //   header: "Actions",
-  //   cell: ({ row }) => {
-  //     return <ReportsTableActions />;
-  //   },
-  // },
+  {
+    accessorKey: "actions",
+    header: "Actions",
+    cell: ({ row }) => {
+      return <ReportsTableActions />;
+    },
+  },
   // { accessorKey: "remarks", header: "Remarks" },
 ];
 

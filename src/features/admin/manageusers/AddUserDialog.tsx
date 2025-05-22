@@ -4,39 +4,77 @@ import AppDialog from "@/apputils/AppDialog";
 import AppSpinner from "@/apputils/AppSpinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAddUser } from "@/hooks/userHooks";
+import { useAddUser, useDisableOrEnableUser } from "@/hooks/userHooks";
 import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { RiUserAddLine } from "react-icons/ri";
 import Papa from "papaparse";
+import { UserDataType } from "@/types/userDataTypes";
 
 interface AddUserDialogInterface {
   onClose: () => void;
+  edit?: boolean;
+  userData?: UserDataType;
 }
-function AddUserDialog({ onClose }: AddUserDialogInterface) {
-  const { handleSubmit, register, formState, setValue, watch } = useForm();
+function AddUserDialog({ onClose, edit, userData }: AddUserDialogInterface) {
+  const { handleSubmit, register, formState, setValue, watch } = useForm({
+    defaultValues: {
+      firstName: edit ? userData?.firstName : "",
+      lastName: edit ? (userData?.lastName ? userData?.lastName : "") : "",
+      email: edit ? userData?.emailId : "",
+      mobile: edit
+        ? userData?.mobileNumber
+          ? userData?.mobileNumber
+          : ""
+        : "",
+    },
+  });
   const { errors } = formState;
   const { addUser, isPending } = useAddUser();
   const { dispatch } = useAppContext();
+  const { editUser, isPending: editUserPending } = useDisableOrEnableUser();
 
   function handleAddUser(e: any) {
-    addUser(
-      {
-        email: e?.email,
-        firstName: e?.firstName,
-        lastName: e?.lastName,
-        mobile: parseInt(e?.mobile ?? ""),
-      },
-      {
-        onSuccess() {
-          dispatch({
-            type: "setRefresh",
-            payload: "",
-          });
-          onClose();
+    if (!edit)
+      addUser(
+        {
+          email: e?.email,
+          firstName: e?.firstName,
+          lastName: e?.lastName,
+          mobile: parseInt(e?.mobile ?? ""),
         },
+        {
+          onSuccess() {
+            dispatch({
+              type: "setRefresh",
+              payload: "",
+            });
+            onClose();
+          },
+        }
+      );
+    else {
+      {
+        editUser(
+          {
+            emailId: e?.email,
+            method: "editUser",
+            userData: e,
+          },
+          {
+            onSuccess(data) {
+              if (data?.data === "SUCCESS") {
+                onClose();
+              }
+              dispatch({
+                type: "setRefresh",
+                payload: "",
+              });
+            },
+          }
+        );
       }
-    );
+    }
   }
 
   function handleCSVUpload(event: React.ChangeEvent<HTMLInputElement>) {
@@ -62,21 +100,26 @@ function AddUserDialog({ onClose }: AddUserDialogInterface) {
 
   return (
     <>
-      <AppSpinner isPending={isPending} />
+      <AppSpinner isPending={isPending || editUserPending} />
       <AppDialog onClose={onClose} placement="CENTER" title="Add user">
         <form
           onSubmit={handleSubmit(handleAddUser)}
           className="flex flex-col gap-3 "
         >
-          <input
-            type="file"
-            accept=".csv"
-            onChange={handleCSVUpload}
-            className="lg:w-[20vw] border px-2 py-1 rounded"
-          />
-          <p className=" text-foreground/60 w-[19vw] ml-1 -mt-2">
-            Upload CSV with headers: firstName, lastName, email, mobile
-          </p>
+          {!edit && (
+            <div className="flex flex-col gap-3">
+              <input
+                type="file"
+                accept=".csv"
+                onChange={handleCSVUpload}
+                className="lg:w-[20vw] border px-2 py-1 rounded"
+              />
+              <p className=" text-foreground/60 w-[19vw] ml-1 -mt-2">
+                Upload CSV with headers: firstName, lastName, email, mobile
+              </p>
+              <p>Download sample file from here : <a download={true} href={"/sample_user.csv"} className="text-primary">Download</a></p>
+            </div>
+          )}
           <Input
             value={watch("firstName") ?? ""}
             className="lg:w-[20vw]"
@@ -100,6 +143,7 @@ function AddUserDialog({ onClose }: AddUserDialogInterface) {
               required: false,
             })}
           />
+          
 
           <Input
             value={watch("email") ?? ""}

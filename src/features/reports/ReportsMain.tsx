@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { DataTable } from "@/components/ui/data-table";
 import { useMemo, useState } from "react";
 import { reportColumns } from "./reportstable/ReportsColumns";
@@ -823,7 +824,7 @@ function ReportsMain() {
         <DataTable
           pagination={pagination}
           setPagination={setPagination}
-          data={paginatedData}
+          data={paginatedData as any}
           columns={reportColumns}
           Toolbar={ReportsTableToolBar}
           totalPages={Math.ceil(data?.length / pagination.pageSize)}

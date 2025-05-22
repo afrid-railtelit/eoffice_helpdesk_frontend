@@ -6,6 +6,8 @@ import ConfirmActionDialog from "./ConfirmActionDialog";
 import { useDisableOrEnableUser } from "@/hooks/userHooks";
 import AppSpinner from "@/apputils/AppSpinner";
 import { useAppContext } from "@/apputils/AppContext";
+import { MdEdit } from "react-icons/md";
+import AddUserDialog from "./AddUserDialog";
 interface ManageUserActionsInterface {
   userData: UserDataType;
 }
@@ -17,6 +19,7 @@ function ManageUserActions({ userData }: ManageUserActionsInterface) {
   >();
   const { editUser, isPending } = useDisableOrEnableUser();
   const { dispatch } = useAppContext();
+  const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
 
   useEffect(() => {
     if (actionMethod) {
@@ -33,6 +36,7 @@ function ManageUserActions({ userData }: ManageUserActionsInterface) {
       {
         emailId: userData?.emailId,
         disabled: actionMethod === "disable" ? true : false,
+        method:"enable"
       },
       {
         onSuccess(data) {
@@ -51,33 +55,53 @@ function ManageUserActions({ userData }: ManageUserActionsInterface) {
   return (
     <div>
       {<AppSpinner isPending={isPending} />}
-      {!userData?.disabled ? (
+      <div className="flex flex-row items-center gap-2">
+        {!userData?.disabled ? (
+          <Button
+            onClick={() => {
+              setActionMethod("disable");
+            }}
+            className="h-7 flex items-center gap-1"
+            variant="constructive"
+          >
+            <FiCheck size={16} /> Enabled
+          </Button>
+        ) : (
+          <Button
+            onClick={() => {
+              setActionMethod("enable");
+            }}
+            className="h-7 flex items-center gap-1"
+            variant="destructive"
+          >
+            <FiSlash size={16} /> Disabled
+          </Button>
+        )}
         <Button
+          className="h-7"
           onClick={() => {
-            setActionMethod("disable");
+            setOpenEditDialog(true);
           }}
-          className="h-7 flex items-center gap-1"
-          variant="constructive"
         >
-          <FiCheck size={16} /> Enabled
+          <MdEdit />
+          Edit
         </Button>
-      ) : (
-        <Button
-          onClick={() => {
-            setActionMethod("enable");
-          }}
-          className="h-7 flex items-center gap-1"
-          variant="destructive"
-        >
-          <FiSlash size={16} /> Disabled
-        </Button>
-      )}
+      </div>
       {openActionDialog && actionMethod && (
         <ConfirmActionDialog
           onConfirm={onConfirmAction}
           user={userData}
           action={actionMethod}
           onClose={handleCloseDialog}
+        />
+      )}
+      {openEditDialog && (
+        <AddUserDialog
+          onClose={() => {
+            setOpenEditDialog(false);
+          }}
+          edit={true}
+          userData={userData}
         />
       )}
     </div>

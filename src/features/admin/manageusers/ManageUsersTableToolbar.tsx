@@ -13,7 +13,7 @@ function ManageUsersTableToolbar({
 }) {
   const [searchedValue, setSearchedValue] = useState<string>("");
   useEffect(() => {
-    setColumnsToSearch(["firstName", "lastName", "mobileNumber", "emailId"]);
+    setColumnsToSearch(["name", "mobileNumber", "emailId"]);
   }, []);
 
   return (

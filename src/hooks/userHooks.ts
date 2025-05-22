@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useHandleApiResponse } from "@/apiServices";
 import {
   addUserAPI,
   editUserAPI,
   getAllUsers,
+  getZonesAPI,
   loginUserAPI,
   restePasswordAPI,
 } from "@/servcies/userAPIS";
@@ -65,8 +67,12 @@ export function useDisableOrEnableUser() {
     isPending,
     mutate: editUser,
   } = useMutation({
-    mutationFn: (data: { emailId: string; disabled: boolean }) =>
-      editUserAPI(data),
+    mutationFn: (data: {
+      emailId: string;
+      disabled?: boolean;
+      method: string;
+      userData?: any;
+    }) => editUserAPI(data),
     onSuccess(data) {
       handleToast(data?.data);
     },
@@ -92,7 +98,9 @@ export function useLogin() {
     mutationFn: (data: { emailId: string; password: boolean; otp?: number }) =>
       loginUserAPI(data),
     onSuccess(data) {
-      handleToast(data?.data);
+      if (data?.data !== "SUCCESS") {
+        handleToast(data?.data);
+      }
     },
     onError() {
       handleToast("ERROR");
@@ -127,5 +135,30 @@ export function useResetPassword() {
     data,
     isPending,
     resetPassword,
+  };
+}
+export function useGetZonesData() {
+  const { handleToast } = useHandleApiResponse();
+
+  const {
+    data,
+    isPending,
+    mutate: getZonesData,
+  } = useMutation({
+    mutationFn: () => getZonesAPI(),
+    onSuccess(data) {
+      if (data?.data !== "SUCCESS") {
+        handleToast(data?.data);
+      }
+    },
+    onError() {
+      handleToast("ERROR");
+    },
+  });
+
+  return {
+    data,
+    isPending,
+    getZonesData,
   };
 }

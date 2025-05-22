@@ -14,7 +14,7 @@ function Footer() {
   }, []);
 
   return (
-    <div className="fixed bottom-0 px-10 w-full bg-background py-2  z-[40] border-t shadow drop-shadow flex items-center justify-between">
+    <div className="fixed bottom-0 px-10 w-full bg-background py-2   border-t shadow drop-shadow flex items-center justify-between">
       <p className="w-fit text-foreground/70 text-xs">
         Designed & Developed by{" "}
         <span className="text-primary cursor-pointer">
@@ -24,8 +24,8 @@ function Footer() {
       <p>Maintained by RailTel Corporation of India Ltd.</p>
 
       <p className="w-fit text-foreground/70 text-xs">
-         {" "}{date?.toDateString()} |{" "}
-        {date?.toLocaleTimeString()}
+        {" "}
+        {date?.toDateString()} | {date?.toLocaleTimeString()}
       </p>
     </div>
   );

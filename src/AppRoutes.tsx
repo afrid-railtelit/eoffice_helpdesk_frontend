@@ -5,9 +5,11 @@ import ManageUserMain from "./features/admin/manageusers/ManageUserMain";
 import DashboardMain from "./features/admin/dashboard/DashboardMain";
 import TicketsMain from "./features/tickets/TicketsMain";
 import ReportsMain from "./features/reports/ReportsMain";
+import { useUpdatePage } from "./hooks/appHooks";
 
 function AppRoutes() {
   const location = useLocation();
+   useUpdatePage();
 
   return (
     <Routes location={location} key={location.pathname}>
@@ -17,6 +19,8 @@ function AppRoutes() {
         <Route path="/admin/users" element={<ManageUserMain />} />
         <Route path="/admin/tickets" element={<TicketsMain />} />
         <Route path="/admin/reports" element={<ReportsMain />} />
+
+        <Route path="/dashboard" element={<DashboardMain />} />
         <Route path="/tickets" element={<TicketsMain />} />
       </Route>
     </Routes>

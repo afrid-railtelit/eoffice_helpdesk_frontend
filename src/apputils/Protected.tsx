@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 function Protected() {
   const loggedIn = localStorage.getItem("rcilEmailId");
-  const navigate = useNavigate(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!loggedIn) {

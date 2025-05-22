@@ -16,3 +16,6 @@ export async function loginUserAPI(data: any) {
 export async function restePasswordAPI(data: any) {
   return postAPI("api/resetpassword", data);
 }
+export async function getZonesAPI() {
+  return getAPI("api/zones");
+}

@@ -76,7 +76,7 @@ export const ticketsColumns: ColumnDef<HelpdeskTicket>[] = [
   {
     accessorKey: "actions",
     header: "Actions",
-    cell: ({ row }) => {
+    cell: () => {
       return <ReportsTableActions />;
     },
   },

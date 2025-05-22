@@ -1,18 +1,17 @@
-;
-
 import { ColumnDef } from "@tanstack/react-table";
 import { UserDataType } from "@/types/userDataTypes";
 import { formatDateTime } from "@/apputils/appUtils";
 import ManageUserActions from "./ManageUserActions";
+import { MdVerified } from "react-icons/md";
+import { X } from "lucide-react";
 
 export const userColumns: ColumnDef<UserDataType>[] = [
   {
-    accessorKey: "firstName",
-    header: "First Name",
-  },
-  {
-    accessorKey: "lastName",
-    header: "Last Name",
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => (
+      <p>{row?.original?.firstName + " " + (row?.original?.lastName ?? "")}</p>
+    ),
   },
   {
     accessorKey: "mobileNumber",
@@ -21,6 +20,25 @@ export const userColumns: ColumnDef<UserDataType>[] = [
   {
     accessorKey: "emailId",
     header: "Email ID",
+  },
+  {
+    accessorKey: "initialLogin",
+    header: "Active status",
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row?.original?.initialLogin ? (
+            <div className="text-constructive flex items-center gap-1">
+              Activated <MdVerified className="text-constructive" />
+            </div>
+          ) : (
+            <div className="text-destructive flex items-center gap-1">
+              Not activated <X className="text-destructive" />
+            </div>
+          )}
+        </div>
+      );
+    },
   },
 
   {
@@ -35,7 +53,7 @@ export const userColumns: ColumnDef<UserDataType>[] = [
   },
   {
     accessorKey: "disabled",
-    header: "Active status",
+    header: "Actions",
     cell: ({ row }) => <ManageUserActions userData={row.original} />,
   },
 ];

@@ -1,7 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { MdVerified } from "react-icons/md";
 import { GrCircleAlert } from "react-icons/gr";
-import ReportsTableActions from "./reportsTableActions";
 
 export type HelpdeskTicket = {
   sNo: number;

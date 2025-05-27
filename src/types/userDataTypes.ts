@@ -11,6 +11,7 @@ export type UserDataType = {
   updatedAt: string;
   role: "EMPLOYEE" | "ADMIN";
   name?: string;
+  level:number
 };
 
 export type divisionDataType = {
@@ -23,10 +24,11 @@ export type zoneDataType = {
   zoneName: string;
   zoneDescription: string;
   divisions: divisionDataType[];
+  id:string
 };
 
 export type lastLoginType = {
-  emailId: string;
+  emailId: string
   osName: string;
   browserName: string;
   osVersion: string;

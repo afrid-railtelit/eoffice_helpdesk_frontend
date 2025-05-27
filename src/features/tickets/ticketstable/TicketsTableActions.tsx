@@ -1,9 +1,13 @@
-import AppDialog from "@/apputils/AppDialog";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import DashboardSubmitDialog from "./TicketSubmitDialog";
+import TicketSubmitDialog from "./TicketSubmitDialog";
+import { ticketDataType } from "@/types/ticketDataType";
 
-function TicketsTableActions() {
+interface TicketsTableActionsInterface {
+  ticketData: ticketDataType;
+}
+function TicketsTableActions({ ticketData }: TicketsTableActionsInterface) {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   return (
     <div>
@@ -14,17 +18,19 @@ function TicketsTableActions() {
           setOpenDialog(true);
         }}
       >
-        Submit
+        {ticketData?.ticketStatus === "RESOLVED"?"Details":"Submit"}
       </Button>
       {openDialog && (
-        <AppDialog
-          title="Hell owolrd"
+        <TicketSubmitDialog
+          issueData={ticketData?.issueData as never}
           onClose={() => {
             setOpenDialog(false);
           }}
-        >
-          <DashboardSubmitDialog />
-        </AppDialog>
+          ticketId={ticketData?.ticketId}
+          remarksData={ticketData?.remarks as any}
+          ticketNumber={ticketData?.ticketNumber}
+          ticketStatus={ticketData?.ticketStatus}
+        />
       )}
     </div>
   );

@@ -1,11 +1,11 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { UserDataType } from "@/types/userDataTypes";
 import { formatDateTime } from "@/apputils/appUtils";
-import ManageUserActions from "./ManageUserActions";
+import ManageUserActions from "./ManageEmployeeActions";
 import { MdVerified } from "react-icons/md";
 import { X } from "lucide-react";
 
-export const userColumns: ColumnDef<UserDataType>[] = [
+export const employeeColumns: ColumnDef<UserDataType>[] = [
   {
     accessorKey: "name",
     header: "Name",

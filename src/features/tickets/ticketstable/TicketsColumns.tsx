@@ -2,65 +2,67 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MdVerified } from "react-icons/md";
 import { GrCircleAlert } from "react-icons/gr";
 import ReportsTableActions from "./TicketsTableActions";
+import { ticketDataType } from "@/types/ticketDataType";
+import { formatDateTime } from "@/apputils/appUtils";
 
-export type HelpdeskTicket = {
-  sNo: number;
-  docketNumber: string;
-  zone: string;
-  division: string;
-  designation: string;
-  name: string;
-  startDate: string;
-  startTime: string;
-  endDate: string | null;
-  endTime: string | null;
-  issue: string;
-  issueDescription: string;
-  issueResolution: string;
-  issueType: "MINOR" | "MAJOR" | "CRITICAL";
-  status: "PENDING" | "RESOLVED";
-  userMobileNumber: string;
-  resolvedByHelpdesk: string;
-  remarks: string | null;
-};
-
-export const ticketsColumns: ColumnDef<HelpdeskTicket>[] = [
+export const ticketsColumns: ColumnDef<ticketDataType>[] = [
   { accessorKey: "sNo", header: "S No" },
-  { accessorKey: "docketNumber", header: "Docket Number" },
+  { accessorKey: "ticketNumber", header: "Docket Number" },
   // { accessorKey: "zone", header: "ZONE" },
   // { accessorKey: "division", header: "DIV" },
   // { accessorKey: "designation", header: "DESIGNATION" },
-  { accessorKey: "name", header: "NAME" },
-  { accessorKey: "userMobileNumber", header: "User Mobile Number" },
-
-  { accessorKey: "issue", header: "Issue" },
-  // { accessorKey: "issueDescription", header: "Issue Description" },
-  // { accessorKey: "issueResolution", header: "Issue Resolution" },
-  // {
-  //   accessorKey: "issueType",
-  //   header: "Issue Type",
-  //   cell: ({ row }) => (
-  //     <div>
-  //       {row.getValue("issueType") === "MAJOR" ? (
-  //         <p className="text-destructive">Major</p>
-  //       ) : (
-  //         <p className="text-orange-400">Minor</p>
-  //       )}
-  //     </div>
-  //   ),
-  // },
+  { accessorKey: "employeeData.employeeName", header: "NAME" },
   {
-    accessorKey: "status",
+    accessorKey: "employeeData.employeeMobile",
+    header: "User Mobile Number",
+    cell: ({ row }) => {
+      return <p>{row?.original?.employeeData?.employeeMobile ?? "-"}</p>;
+    },
+  },
+
+  { accessorKey: "issueData.issueCode", header: "Issue" },
+  { accessorKey: "issueData.issueDescription", header: "Issue Description" },
+  {
+    accessorKey: "criticalLevel",
+    header: "Critical level",
+    cell: ({ row }) => (
+      <div className="font-semibold">
+        {row.getValue("criticalLevel") === "MAJOR" ? (
+          <p className="text-destructive">Major</p>
+        ) : row.getValue("criticalLevel") === "MINOR" ? (
+          <p className="text-orange-400">Minor</p>
+        ) : (
+          <p className="text-destructive ">Critical</p>
+        )}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "ticketStatus",
     header: "Status",
     cell: ({ row }) => (
       <div>
-        {row.getValue("status") === "PENDING" ? (
-          <div title="Pending" className="flex items-center text-destructive">
+        {row.getValue("ticketStatus") === "PENDING" ? (
+          <div
+            title="Pending"
+            className="flex gap-1 items-center text-destructive"
+          >
             Pending
             <GrCircleAlert className="mt-[0.1rem]" />
           </div>
+        ) : row.getValue("ticketStatus") === "INPROGRESS" ? (
+          <div
+            title="Resolved"
+            className="text-yellow-500 gap-1 flex items-center"
+          >
+            In progress
+            <MdVerified />
+          </div>
         ) : (
-          <div title="Resolved" className="text-constructive flex items-center">
+          <div
+            title="Resolved"
+            className="text-constructive gap-1 flex items-center"
+          >
             Resolved
             <MdVerified />
           </div>
@@ -68,66 +70,47 @@ export const ticketsColumns: ColumnDef<HelpdeskTicket>[] = [
       </div>
     ),
   },
-  { accessorKey: "resolvedByHelpdesk", header: "Resolved By" },
-  { accessorKey: "startDate", header: "Start Date" },
-  { accessorKey: "startTime", header: "Start Time" },
-  { accessorKey: "endDate", header: "End Date" },
-  { accessorKey: "endTime", header: "End Time" },
+  { accessorKey: "createdBy", header: "Created By" },
+  {
+    accessorKey: "resolvedBy",
+    header: "Resolved By",
+    cell: ({ row }) => (
+      <div>
+        {row.getValue("resolvedBy") ? (
+          <p>{row.getValue("resolvedBy")}</p>
+        ) : (
+          <p>-</p>
+        )}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Created at",
+    cell: ({ row }) => (
+      <p className="flex flex-col ">
+        <span>{formatDateTime(row?.getValue("createdAt")).date}</span>
+        <span>{formatDateTime(row?.getValue("createdAt")).time}</span>
+      </p>
+    ),
+  },
+
+  {
+    accessorKey: "updatedAt",
+    header: "Updated at",
+    cell: ({ row }) => (
+      <p className="flex flex-col ">
+        <span>{formatDateTime(row?.getValue("updatedAt")).date}</span>
+        <span>{formatDateTime(row?.getValue("updatedAt")).time}</span>
+      </p>
+    ),
+  },
+
   {
     accessorKey: "actions",
     header: "Actions",
-    cell: () => {
-      return <ReportsTableActions />;
+    cell: ({ row }) => {
+      return <ReportsTableActions ticketData={row.original} />;
     },
   },
-  // { accessorKey: "remarks", header: "Remarks" },
 ];
-
-//
-
-// import { ColumnDef } from "@tanstack/react-table"
-
-// export type HelpdeskTicket = {
-//   sNo: number
-//   docketNumber: string
-//   zone: string
-//   division: string
-//   designation: string
-//   name: string
-//   startDate: string
-//   startTime: string
-//   endDate: string | null
-//   endTime: string | null
-//   issue: string
-//   issueDescription: string
-//   issueResolution: string
-//   issueType: "MINOR" | "MAJOR" | "CRITICAL"
-//   status: "PENDING" | "RESOLVED"
-//   userMobileNumber: string
-//   resolvedByHelpdesk: string
-//   remarks: string | null
-// }
-
-// export const columns: ColumnDef<HelpdeskTicket>[] = [
-//   { accessorKey: "sNo", header: "S No" },
-//   { accessorKey: "docketNumber", header: "Docket Number" },
-//   { accessorKey: "zone", header: "ZONE" },
-//   { accessorKey: "division", header: "DIVISION" },
-//   { accessorKey: "designation", header: "DESIGNATION" },
-//   { accessorKey: "name", header: "NAME" },
-//   { accessorKey: "startDate", header: "Start Date" },
-//   { accessorKey: "startTime", header: "Start Time" },
-//   { accessorKey: "endDate", header: "End Date" },
-//   { accessorKey: "endTime", header: "End Time" },
-//   { accessorKey: "issue", header: "Issue" },
-//   { accessorKey: "issueDescription", header: "Issue Description" },
-//   { accessorKey: "issueResolution", header: "Issue Resolution" },
-//   {
-//     accessorKey: "issueType",
-//     header: "Issue Type",
-//   },
-//   { accessorKey: "status", header: "Status" },
-//   { accessorKey: "userMobileNumber", header: "User Mobile Number" },
-//   { accessorKey: "resolvedByHelpdesk", header: "Resolved By" },
-//   { accessorKey: "remarks", header: "Remarks" },
-// ]

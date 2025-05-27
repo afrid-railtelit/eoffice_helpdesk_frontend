@@ -31,6 +31,7 @@ interface DataTableProps<TData, TValue> {
   totalPages: number;
   columnFilters?: ColumnFiltersState;
   setColumnFilters?: React.Dispatch<React.SetStateAction<ColumnFiltersState>>;
+  manualFiltering?:boolean
 }
 
 export function DataTable<TData, TValue>({
@@ -42,6 +43,7 @@ export function DataTable<TData, TValue>({
   totalPages,
   columnFilters,
   setColumnFilters,
+  manualFiltering
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [sortOpen, setSortOpen] = useState<any>("");
@@ -62,6 +64,7 @@ export function DataTable<TData, TValue>({
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
+    manualFiltering:manualFiltering,
     getFilteredRowModel: getFilteredRowModel(),
     onPaginationChange: setPagination,
     onGlobalFilterChange: setGlobalFilter,
@@ -142,7 +145,7 @@ export function DataTable<TData, TValue>({
                       </PopoverTrigger>
                       <PopoverContent
                         onBlur={() => setSortOpen(false)}
-                        className="ml-14 w-fit bg-white dark:bg-gray-800 rounded-lg shadow-lg p-2 flex flex-col gap-2 select-none"
+                        className="ml-14 w-fit bg-white  h-fit dark:bg-gray-800 rounded-lg shadow-lg p-2 flex flex-col gap-2 select-none"
                       >
                         {["Asc", "Desc", "Clear"].map((option) => {
                           const Icon =

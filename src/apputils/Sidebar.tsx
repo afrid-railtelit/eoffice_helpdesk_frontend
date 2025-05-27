@@ -4,6 +4,7 @@ import { useAppContext } from "./AppContext";
 import clsx from "clsx";
 import { useNavigate } from "react-router-dom";
 import { useGetrole } from "@/hooks/appHooks";
+import { FaUserTie } from "react-icons/fa";
 
 function Sidebar() {
   const myRole = useGetrole();
@@ -39,6 +40,14 @@ function Sidebar() {
       path: "/reports",
       description: "Generate and view system usage and performance reports.",
       role: "ADMIN",
+    },
+
+    {
+      label: "Manage Employees",
+      icon: FaUserTie, 
+      indexPath: 4,
+      path: "/employees",
+      description: "Add, edit, and manage employee records and access.",
     },
   ];
   const { selectedPage, dispatch } = useAppContext();

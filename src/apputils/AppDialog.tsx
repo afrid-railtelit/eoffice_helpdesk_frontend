@@ -6,12 +6,14 @@ interface AppDialogProps {
   children: ReactNode;
   onClose: () => void;
   placement?: "CENTER" | "RIGHT";
+  noClose?: boolean;
 }
 
 export default function AppDialog({
   title,
   children,
   onClose,
+  noClose,
   placement = "CENTER",
 }: AppDialogProps) {
   const [visible, setVisible] = useState(false);
@@ -46,7 +48,11 @@ export default function AppDialog({
     <>
       {/* Overlay */}
       <div
-        onClick={closeDialog}
+        onClick={() => {
+          if (!noClose) {
+            closeDialog();
+          }
+        }}
         className={`fixed inset-0 bg-black/60 backdrop-blur-xs bg-opacity-50  z-[50] transition-opacity duration-350 ease-out ${
           isAnimating ? "opacity-100" : "opacity-0"
         }`}
@@ -88,13 +94,15 @@ export default function AppDialog({
           >
             {title}
           </h2>
-          <button
-            aria-label="Close dialog"
-            onClick={closeDialog}
-            className="text-gray-600 hover:text-gray-900 transition cursor-pointer" 
-          >
-            <X size={20} />
-          </button>
+          {!noClose && (
+            <button
+              aria-label="Close dialog"
+              onClick={closeDialog}
+              className="text-gray-600 hover:text-gray-900 transition cursor-pointer"
+            >
+              <X size={20} />
+            </button>
+          )}
         </header>
 
         {/* Scrollable content */}

@@ -15,6 +15,12 @@ interface SearchableSelectInterface {
   onSelect: (item: searchableSelectDataType) => void;
   isDisabled?: boolean;
   label: string;
+  errorMessage?: string;
+  register?: any;
+  name?: string;
+  error?: string;
+  clear?: boolean;
+  icon?:string
 }
 
 function SearchableSelect({
@@ -22,6 +28,12 @@ function SearchableSelect({
   onSelect,
   isDisabled,
   label,
+  errorMessage,
+  name,
+  register,
+  error,
+  clear,
+  icon
 }: SearchableSelectInterface) {
   const [clickedInput, setClickedInput] = useState<boolean>(false);
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
@@ -31,10 +43,13 @@ function SearchableSelect({
   >(undefined);
 
   useEffect(() => {
-    if (!mainData) {
+    if (!mainData || mainData?.length !== data?.length) {
       setMainData(data);
     }
-  }, [data]);
+    if (clear) {
+      setInputValue("");
+    }
+  }, [data, clear]);
 
   function handleSelectItem(item: searchableSelectDataType) {
     setInputValue(item.key);
@@ -77,20 +92,28 @@ function SearchableSelect({
     <div className="relative    rounded-md w-[20vw]">
       <div
         className="flex items-center w-[20vw] justify-center relative"
-        onClick={() => setClickedInput(!clickedInput)}
+        onClick={() => {
+          if (!isDisabled) {
+            setClickedInput(!clickedInput);
+          }
+        }}
       >
         <Input
-          className=" lg:w-[20vw]"
+          {...register(name, {
+            required: error,
+          })}
+          className=" lg:w-[20vw] "
           onBlur={() => setClickedInput(false)}
           onChange={handleSearch}
           disabled={isDisabled}
           onKeyDown={handleKeyDown}
-          value={inputValue ? inputValue : undefined}
+          value={inputValue ? inputValue : ""}
           about={label}
           placeholder={label}
           id={label}
           aria-label={label}
-          noErrorMessage={true}
+          errorMessage={errorMessage}
+          icon={icon}
         />
         {!clickedInput ? (
           <IoIosArrowDown className="absolute right-2 w-4 h-4   " />
@@ -100,7 +123,7 @@ function SearchableSelect({
       </div>
 
       <div
-        className={`absolute bg-white mt-1 w-full border border-gray-300 rounded-md shadow-lg transform transition-all duration-300  origin-top z-[100]  ${
+        className={`fixed bg-white mt-1 w-[20vw] border border-gray-300 rounded-md shadow-lg transform transition-all duration-300  origin-top z-[60]  ${
           clickedInput
             ? "opacity-100 scale-y-100 max-h-60 overflow-y-auto"
             : "opacity-0 scale-y-0 max-h-0 overflow-hidden"

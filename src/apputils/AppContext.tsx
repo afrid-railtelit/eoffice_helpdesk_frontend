@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { issueDataType } from "@/types/employeeDataTypes";
 import { createContext, useContext, useReducer, type ReactNode } from "react";
 
 export type dispatchDataType = {
@@ -14,6 +15,7 @@ export type contextType = {
     desc: string;
     index: number;
   };
+  issuesData:issueDataType[]
 };
 
 const initState: contextType = {
@@ -24,6 +26,7 @@ const initState: contextType = {
     desc: "View,edit and more ..(Coming soon)",
     index: 0,
   },
+  issuesData:[]
 };
 
 const contextProvider = createContext(initState);
@@ -41,13 +44,20 @@ function reducer(state: contextType, action: dispatchDataType) {
         ...state,
         selectedPage: action?.payload,
       };
+    
+    case "setIssuesData":
+      return {
+        ...state,
+        issuesData: action?.payload,
+      };
+    
 
     default:
       throw new Error("Action unkonwn");
   }
 }
 export default function AppContext({ children }: { children: ReactNode }) {
-  const [{ refresh, selectedPage }, dispatch] = useReducer(reducer, initState);
+  const [{ refresh, selectedPage,issuesData }, dispatch] = useReducer(reducer, initState);
 
   return (
     <contextProvider.Provider
@@ -55,6 +65,7 @@ export default function AppContext({ children }: { children: ReactNode }) {
         dispatch,
         selectedPage,
         refresh,
+        issuesData
       }}
     >
       {children}

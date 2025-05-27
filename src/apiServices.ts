@@ -72,6 +72,13 @@ export function useHandleApiResponse() {
       message: "User not found",
       variant: "destructive",
     },
+
+    {
+      data: "EMPLOYEE_NOT_FOUND",
+      message: "Employee not found",
+      variant: "destructive",
+    },
+
     {
       data: "INVALID_NAME",
       message: "Please enter a valid name",

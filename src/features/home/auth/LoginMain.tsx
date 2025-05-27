@@ -77,7 +77,11 @@ function LoginMain() {
               localStorage.setItem("rcilFN", userData?.firstName);
               localStorage.setItem("rcilLN", userData?.lastName);
               localStorage.setItem("rcilRole", userData?.role);
-              localStorage.setItem("rcilLastLoginDetails", JSON.stringify(data?.lastLoginDetails));
+              localStorage.setItem("rcilLevel", userData?.level?.toString());
+              localStorage.setItem(
+                "rcilLastLoginDetails",
+                JSON.stringify(data?.lastLoginDetails)
+              );
 
               if (userData?.role === "ADMIN") {
                 dispatch({

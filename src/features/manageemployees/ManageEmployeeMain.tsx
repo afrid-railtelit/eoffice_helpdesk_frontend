@@ -1,29 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DataTable } from "@/components/ui/data-table";
-import { userColumns } from "./ManageUsersColumns";
 import { useEffect, useState } from "react";
-import ManageUsersTableToolbar from "./ManageUsersTableToolbar";
+import ManageEmployeeTableToolbar from "./ManageEmployeeTableToolbar";
 import { Button } from "@/components/ui/button";
-import { FiUserPlus } from "react-icons/fi";
-import AddUserDialog from "./AddUserDialog";
 import { useGetAlUsers } from "@/hooks/userHooks";
 import AppSpinner from "@/apputils/AppSpinner";
 import { useAppContext } from "@/apputils/AppContext";
 import { ColumnFiltersState } from "@tanstack/react-table";
+import { employeeColumns } from "./ManageEmployeesColumns";
+import { FaUserTie } from "react-icons/fa";
+import AddEmployeeDialog from "./AddEmployeeDialog";
 
-function ManageUserMain() {
+function ManageEmployeeMain() {
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 5,
   });
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [openAddUser, setOpenAdduser] = useState<boolean>(false);
-  const { isPending, getUsers ,data} = useGetAlUsers();
+  const { isPending, getUsers, data } = useGetAlUsers();
   const { refresh } = useAppContext();
 
   useEffect(() => {
-    getUsers( "", {
-    });
+    getUsers("", {});
   }, [refresh]);
 
   return (
@@ -35,22 +34,22 @@ function ManageUserMain() {
             setOpenAdduser(true);
           }}
         >
-          <FiUserPlus />
-          Add User
+          <FaUserTie />
+          Add Employee
         </Button>
       </div>
       <DataTable
         data={data?.users ?? []}
-        columns={userColumns}
+        columns={employeeColumns}
         pagination={pagination}
         setPagination={setPagination}
         totalPages={1}
         columnFilters={columnFilters}
         setColumnFilters={setColumnFilters}
-        Toolbar={ManageUsersTableToolbar}
+        Toolbar={ManageEmployeeTableToolbar}
       />
       {openAddUser && (
-        <AddUserDialog
+        <AddEmployeeDialog
           onClose={() => {
             setOpenAdduser(false);
           }}
@@ -61,4 +60,4 @@ function ManageUserMain() {
   );
 }
 
-export default ManageUserMain;
+export default ManageEmployeeMain;

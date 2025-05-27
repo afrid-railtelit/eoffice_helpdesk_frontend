@@ -19,6 +19,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useGetEmployeeDetails } from "@/hooks/employeeHooks";
+import AppSpinner from "@/apputils/AppSpinner";
+import { employeeDataType } from "@/types/employeeDataTypes";
+import SearchableSelect, {
+  searchableSelectDataType,
+} from "@/apputils/SearchableSelect";
+import { useAppContext } from "@/apputils/AppContext";
+import { LuAsterisk } from "react-icons/lu";
+import { useRaiseNewTicket } from "@/hooks/userHooks";
+import { useGetEmailId } from "@/hooks/appHooks";
 
 interface NewTicketDialogInterface {
   onClose: () => void;
@@ -31,14 +41,84 @@ function NewTicketDialog({ onClose }: NewTicketDialogInterface) {
     pageSize: 1,
   });
   const [data, setData] = useState<any>();
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
 
+  const { getEmployeeDetails, isPending } = useGetEmployeeDetails();
+  const { issuesData } = useAppContext();
+
+  const [selectIssueType, setSelectedIssueType] = useState<any>();
+  const [selectedIssueCriticalLevel, setSelectedIssueCriticalLevel] =
+    useState<string>("");
+  const [issueCriticalLevelError, setIssueCriticalLevelError] =
+    useState<string>("");
+  const [issueTypeError, setIssueTypeError] = useState<string>("");
+  const { isPending: raisingNewTicket, raiseNewTicket } = useRaiseNewTicket();
+  const myEmailId = useGetEmailId();
+  const { dispatch } = useAppContext();
+
+  function handleGetEmployeeDetails() {
+    if (searchedValue) {
+      getEmployeeDetails(searchedValue?.trim(), {
+        onSuccess(data) {
+          setData(data?.employee);
+        },
+      });
+    }
+  }
+
+  function handleSelectIssueType(item: searchableSelectDataType) {
+    const issueCode = item.key.trim().split("-")[0];
+    const issueDescription = item.key.trim().split("-")[1];
+    setSelectedIssueType({
+      issueCode: issueCode?.trim(),
+      issueDescription,
+      issueId: item?.value,
+    });
+    setIssueTypeError("");
+  }
+
+  function handleRaiseTicket() {
+    if (!selectedIssueCriticalLevel) {
+      setIssueCriticalLevelError("Please select issue critical level");
+    }
+    if (!selectIssueType) {
+      setIssueTypeError("Please select issue type");
+    }
+    if (selectedIssueCriticalLevel && selectIssueType) {
+      raiseNewTicket(
+        {
+          employeeCode: data[0]?.employeeCode,
+          criticalLevel: selectedIssueCriticalLevel,
+          issueId: selectIssueType?.issueId,
+          emailId: myEmailId,
+        },
+        {
+          onSuccess(data) {
+            if (data?.data === "SUCCESS") {
+              dispatch({
+                type: "setRefresh",
+                payload: "",
+              });
+              onClose();
+            }
+          },
+        }
+      );
+    }
+  }
+  function handleClear() {
+    setSelectedIssueType(undefined);
+    setIssueCriticalLevelError("");
+    setIssueTypeError("");
+    setSelectedIssueCriticalLevel("");
+    setData(undefined);
+    setSearchedValue("");
+  }
 
   return (
     <div>
-      {/* {<AppSpinner isPending={isPending} />} */}
+      {<AppSpinner isPending={isPending || raisingNewTicket} />}
       <AppDialog onClose={onClose} placement="CENTER" title="New Ticket">
-        <div className="min-h-[50vh] min-w-[50vw]">
+        <div className=" min-w-[70vw]">
           <div className="flex items-center gap-3">
             <div className="lg:w-[20vw]">
               <Input
@@ -49,71 +129,114 @@ function NewTicketDialog({ onClose }: NewTicketDialogInterface) {
                   const value = e?.target?.value;
                   setSearchedValue(value);
                 }}
-                onClear={() => {
-                  setSearchedValue("");
-                }}
+                onClear={handleClear}
                 noErrorMessage={true}
-                about="Search by Employee Code "
-                placeholder="Search by Employee Code "
+                about="Search by Employee Code or Email "
+                placeholder="Search by Employee Code or Email "
               />
             </div>
             <Button
               title="Search"
-              onClick={() => {
-                setData([
-                  {
-                    sNo: 1,
-                    zone: "CR",
-                    division: "SCR HQ",
-                    designation: "JR CLERK",
-                    name: "David",
-                    userMobileNumber: 93905579289,
-                  },
-                ]);
-              }}
+              disabled={!searchedValue}
+              onClick={handleGetEmployeeDetails}
             >
               <RiSearchLine />
               Search
             </Button>
-            <Button variant={"ghost"} title="Clear">
+            <Button onClick={handleClear} variant={"ghost"} title="Clear">
               <X />
               Clear
             </Button>
           </div>
           <div>
-            {data && (
+            {data && searchedValue && (
               <div className="flex flex-col gap-4">
                 <DataTable
                   columns={newTicketDialogColumn}
                   totalPages={1}
                   pagination={pagination}
                   setPagination={setPagination}
-                  data={data}
+                  data={data?.map((item: employeeDataType, index: number) => {
+                    return {
+                      ...item,
+                      sNo: index + 1,
+                    };
+                  })}
                   columnFilters={columnFilters}
                   setColumnFilters={setColumnFilters}
                 />
-                <div>
-                  <Select
-                    onValueChange={(value) => {
-                      setSelectedStatus(value);
-                    }}
+                <div className="flex flex-row items-center gap-5 ">
+                  <div className="flex flex-col h-14">
+                    <div className="flex flex-row items-center ">
+                      <Select
+                        onValueChange={(value) => {
+                          setIssueCriticalLevelError("");
+                          setSelectedIssueCriticalLevel(value);
+                        }}
+                      >
+                        <SelectTrigger
+                          value={selectedIssueCriticalLevel}
+                          about="Issue critical Level"
+                          className="lg:w-[20vw] text-xs min-h-10 "
+                        >
+                          <SelectValue placeholder="Select critical Level" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Issue critical Level</SelectLabel>
+                            <SelectItem value="MINOR">Minor</SelectItem>
+                            <SelectItem value="MAJOR">Major</SelectItem>
+                            <SelectItem value="CRITICAL">Critical</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <span className="w-3 h-3">
+                        <LuAsterisk className="w-3  h-3  text-destructive" />
+                      </span>
+                    </div>
+                    {
+                      <p className="text-destructive ml-[0.1rem] ">
+                        {
+                          <label className="text-xs">
+                            {issueCriticalLevelError}
+                          </label>
+                        }
+                      </p>
+                    }
+                  </div>
+
+                  <div className="flex flex-col h-14">
+                    <div className="flex flex-row items-center">
+                      <SearchableSelect
+                        onSelect={handleSelectIssueType}
+                        label="Select issue type"
+                        data={issuesData?.map((item) => {
+                          return {
+                            key:
+                              item?.issueCode + " - " + item?.issueDescription,
+                            value: item?.id,
+                          };
+                        })}
+                      />
+                      <span className="w-3 h-3">
+                        <LuAsterisk className="w-3  h-3  text-destructive" />
+                      </span>
+                    </div>
+                    {
+                      <p className="text-destructive ml-[0.1rem] ">
+                        {<label className="text-xs">{issueTypeError}</label>}
+                      </p>
+                    }
+                  </div>
+                </div>
+                <div className="w-full flex justify-center ">
+                  <Button
+                    onClick={handleRaiseTicket}
+                    className="px-10 py-6"
+                    variant={"destructive"}
                   >
-                    <SelectTrigger
-                      value={selectedStatus}
-                      about="Issue type"
-                      className="lg:w-[20vw]"
-                    >
-                      <SelectValue placeholder="Select Issue type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Issue Category</SelectLabel>
-                        <SelectItem value="PENDING">Minor</SelectItem>
-                        <SelectItem value="RESOLVED">Major</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  
+                    Raise ticekt
+                  </Button>
                 </div>
               </div>
             )}

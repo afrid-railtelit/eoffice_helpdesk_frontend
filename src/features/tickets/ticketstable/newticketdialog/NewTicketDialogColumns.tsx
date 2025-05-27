@@ -1,21 +1,20 @@
+import { employeeDataType } from "@/types/employeeDataTypes";
 import { ColumnDef } from "@tanstack/react-table";
 
 
-export type HelpdeskTicket = {
-  sNo: number;
-  zone: string;
-  division: string;
-  designation: string;
-  name: string;
-  userMobileNumber: string;
-};
 
-export const newTicketDialogColumn: ColumnDef<HelpdeskTicket>[] = [
+
+export const newTicketDialogColumn: ColumnDef<employeeDataType>[] = [
   { accessorKey: "sNo", header: "S No" },
-  { accessorKey: "zone", header: "ZONE" },
-  { accessorKey: "division", header: "DIV" },
+  { accessorKey: "employeeCode", header: "Employee code" },
+
+  { accessorKey: "zone", header: "Zone" },
+  { accessorKey: "division", header: "Division" },
   { accessorKey: "designation", header: "DESIGNATION" },
-  { accessorKey: "name", header: "NAME" },
-  { accessorKey: "userMobileNumber", header: "User Mobile Number" },
+  { accessorKey: "employeeName", header: "NAME" },
+  { accessorKey: "dateOfBirth", header: "Date of birth" },
+
+  { accessorKey: "mobile", header: "User Mobile Number" },
+  { accessorKey: "email", header: "Email id" },
 ];
 

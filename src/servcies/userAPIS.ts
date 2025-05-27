@@ -19,3 +19,15 @@ export async function restePasswordAPI(data: any) {
 export async function getZonesAPI() {
   return getAPI("api/zones");
 }
+export async function changePasswordAPI(data:any) {
+  return postAPI("api/changepassword",data);
+}
+export async function raiseNewTicketAPI(data:any) {
+  return postAPI("api/newticket",data);
+}
+export async function getAllTicketsAPI(data:any) {
+  return postAPI("api/tickets",data);
+}
+export async function updateTicketAPI(data:any) {
+  return postAPI("api/updateticket",data);
+}

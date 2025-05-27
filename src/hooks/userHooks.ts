@@ -2,11 +2,15 @@
 import { useHandleApiResponse } from "@/apiServices";
 import {
   addUserAPI,
+  changePasswordAPI,
   editUserAPI,
+  getAllTicketsAPI,
   getAllUsers,
   getZonesAPI,
   loginUserAPI,
+  raiseNewTicketAPI,
   restePasswordAPI,
+  updateTicketAPI,
 } from "@/servcies/userAPIS";
 import { useMutation } from "@tanstack/react-query";
 
@@ -44,6 +48,8 @@ export function useAddUser() {
       mobile: number;
       firstName: string;
       lastName: string;
+      users: any;
+      level:number
     }) => addUserAPI(data),
     onSuccess(data) {
       handleToast(data?.data);
@@ -160,5 +166,105 @@ export function useGetZonesData() {
     data,
     isPending,
     getZonesData,
+  };
+}
+export function useChangePassword() {
+  const { handleToast } = useHandleApiResponse();
+  const {
+    data,
+    isPending,
+    mutate: changePassword,
+  } = useMutation({
+    mutationFn: ({
+      emailId,
+      password,
+    }: {
+      password: string;
+      emailId: string;
+    }) =>
+      changePasswordAPI({
+        emailId,
+        password,
+      }),
+    onSuccess(data) {
+      handleToast(data?.data);
+    },
+    onError() {
+      handleToast("ERROR");
+    },
+  });
+
+  return {
+    data,
+    isPending,
+    changePassword,
+  };
+}
+export function useRaiseNewTicket() {
+  const { handleToast } = useHandleApiResponse();
+  const {
+    data,
+    isPending,
+    mutate: raiseNewTicket,
+  } = useMutation({
+    mutationFn: (data: any) => raiseNewTicketAPI(data),
+    onSuccess(data) {
+      handleToast(data?.data);
+    },
+    onError() {
+      handleToast("ERROR");
+    },
+  });
+
+  return {
+    data,
+    isPending,
+    raiseNewTicket,
+  };
+}
+export function useGetAllTickets() {
+  const { handleToast } = useHandleApiResponse();
+  const {
+    data,
+    isPending,
+    mutate: getAllTickets,
+  } = useMutation({
+    mutationFn: (data: any) => getAllTicketsAPI(data),
+    onSuccess(data) {
+      if (data?.data !== "SUCCESS") {
+        handleToast(data?.data);
+      }
+    },
+    onError() {
+      handleToast("ERROR");
+    },
+  });
+
+  return {
+    data,
+    isPending,
+    getAllTickets,
+  };
+}
+export function useUpdateTikcetDetails() {
+  const { handleToast } = useHandleApiResponse();
+  const {
+    data,
+    isPending,
+    mutate: updateTicket,
+  } = useMutation({
+    mutationFn: (data: any) => updateTicketAPI(data),
+    onSuccess(data) {
+      handleToast(data?.data);
+    },
+    onError() {
+      handleToast("ERROR");
+    },
+  });
+
+  return {
+    data,
+    isPending,
+    updateTicket,
   };
 }

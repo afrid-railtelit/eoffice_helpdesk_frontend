@@ -1,63 +1,22 @@
-import { FaUsers, FaTicketAlt, FaChartBar } from "react-icons/fa";
-import { MdOutlineDashboard } from "react-icons/md";
+
 import { useAppContext } from "./AppContext";
 import clsx from "clsx";
 import { useNavigate } from "react-router-dom";
-import { useGetrole } from "@/hooks/appHooks";
-import { FaUserTie } from "react-icons/fa";
+import { menuItems, useGetrole, useGetUserLevel } from "@/hooks/appHooks";
 
 function Sidebar() {
   const myRole = useGetrole();
+  const userLevel = useGetUserLevel()
 
-  const menuItems = [
-    {
-      label: "Dashboard",
-      icon: MdOutlineDashboard,
-      indexPath: 0,
-      path: "/dashboard",
-      description: "Overview of system metrics and quick actions.",
-    },
-    {
-      label: "Manage Users",
-      icon: FaUsers,
-      indexPath: 1,
-      path: "/users",
-      description: "Add, edit, or remove user accounts and permissions.",
-      role: "ADMIN",
-    },
-    {
-      label: "Tickets",
-      icon: FaTicketAlt,
-      indexPath: 2,
-      path: "/tickets",
-      description: "View and manage support tickets and more...",
-      role: "EMPLOYEE",
-    },
-    {
-      label: "Reports",
-      icon: FaChartBar,
-      indexPath: 3,
-      path: "/reports",
-      description: "Generate and view system usage and performance reports.",
-      role: "ADMIN",
-    },
-
-    {
-      label: "Manage Employees",
-      icon: FaUserTie, 
-      indexPath: 4,
-      path: "/employees",
-      description: "Add, edit, and manage employee records and access.",
-    },
-  ];
+  
   const { selectedPage, dispatch } = useAppContext();
   const navigate = useNavigate();
 
   return (
     <div className="bg-primary text-background  py-10 px-4 w-fit min-w-[15vw] flex flex-col gap-4">
-      {menuItems.map(
-        ({ label, role, path, description, indexPath, icon: Icon }) => {
-          if (!role || role === myRole) {
+      {menuItems?.map(
+        ({ label, role, path, description, indexPath,level, icon: Icon }) => {
+          if ((!role || role === myRole) && (!level || level === userLevel)) {
             return (
               <li
                 onClick={() => {

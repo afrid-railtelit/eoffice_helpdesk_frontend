@@ -11,10 +11,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { X } from "lucide-react";
+import { useGetrole } from "@/hooks/appHooks";
 
 function TicketsTableToolBar({ table }: { table: any }) {
+  const myRole = useGetrole();
   const [searchedValue, setSearchedValue] = useState<string>("");
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>(
+    myRole === "ADMIN" ? "RESOLVED" : ""
+  );
   const [criticalLevel, setCriticalLevel] = useState<string>();
 
   function handleSearch() {
@@ -25,6 +29,7 @@ function TicketsTableToolBar({ table }: { table: any }) {
     table
       .getColumn("ticketStatus")
       ?.setFilterValue(selectedStatus ? selectedStatus : "null");
+    table.setPageIndex(0);
   }
 
   function handleClear() {
@@ -35,26 +40,31 @@ function TicketsTableToolBar({ table }: { table: any }) {
     table.getColumn("ticketNumber")?.setFilterValue("null");
     table.getColumn("ticketStatus")?.setFilterValue("null");
     table.getColumn("criticalLevel")?.setFilterValue("null");
+    table.getColumn("ticketStatus")?.setFilterValue("clear");
+    table.setPageIndex(0);
   }
   function handleInputClear() {
     setSearchedValue("");
     table.getColumn("ticketNumber")?.setFilterValue("null");
+    table.setPageIndex(0);
   }
   return (
     <div className="flex flex-row items-center gap-3">
-      <Input
-        icon="search"
-        value={searchedValue}
-        onChange={(e) => {
-          const value = e?.target?.value;
-          setSearchedValue(value);
-        }}
-        about="Search By Email id,Name or Mobile number..."
-        className="lg:w-[20vw]"
-        placeholder="Search By Email id,Name or Mobile number..."
-        noErrorMessage={true}
-        onClear={handleInputClear}
-      />
+      {myRole !== "ADMIN" && (
+        <Input
+          icon="search"
+          value={searchedValue}
+          onChange={(e) => {
+            const value = e?.target?.value;
+            setSearchedValue(value);
+          }}
+          about="Search By Email id,Name or Mobile number..."
+          className="lg:w-[20vw]"
+          placeholder="Search By Email id,Name or Mobile number..."
+          noErrorMessage={true}
+          onClear={handleInputClear}
+        />
+      )}
       <Select
         value={selectedStatus}
         onValueChange={(value) => {
@@ -75,25 +85,27 @@ function TicketsTableToolBar({ table }: { table: any }) {
         </SelectContent>
       </Select>
 
-      <Select
-        onValueChange={(value) => {
-          setCriticalLevel(value);
-        }}
-        value={criticalLevel}
-      >
-        <SelectTrigger
+      {myRole !== "ADMIN" && (
+        <Select
+          onValueChange={(value) => {
+            setCriticalLevel(value);
+          }}
           value={criticalLevel}
-          about="Select critical level"
-          className="lg:w-[12vw]"
         >
-          <SelectValue placeholder="Select critical level" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="MINOR">Minor</SelectItem>
-          <SelectItem value="MAJOR">Major</SelectItem>
-          <SelectItem value="CRITICAL">Critical</SelectItem>
-        </SelectContent>
-      </Select>
+          <SelectTrigger
+            value={criticalLevel}
+            about="Select critical level"
+            className="lg:w-[12vw]"
+          >
+            <SelectValue placeholder="Select critical level" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="MINOR">Minor</SelectItem>
+            <SelectItem value="MAJOR">Major</SelectItem>
+            <SelectItem value="CRITICAL">Critical</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
 
       <Button onClick={handleSearch} title="Search">
         <RiSearchLine />

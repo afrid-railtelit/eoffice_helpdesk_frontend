@@ -4,11 +4,15 @@ interface employeeDataType {
   employeeCode: string;
   employeeDateOfBirth: string; // ISO date string
   employeeEmail: string;
+  zone:string;
+  division:string;
+  designation:string
 }
 
 interface issueDataType {
   issueCode: string;
   issueDescription: string;
+  issueResolution:string
   issueId: string;
 }
 export type ticketRemarkDataType = {

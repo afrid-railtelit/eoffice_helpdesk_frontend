@@ -3,6 +3,8 @@ import { useHandleApiResponse } from "@/apiServices";
 import { useAppContext } from "@/apputils/AppContext";
 import {
   addEmployeeAPI,
+  allEmployeeAPI,
+  editEmployeeAPI,
   getEmployeeDetailsAPI,
   getIssuesDataAPI,
 } from "@/servcies/employeeAPIS";
@@ -16,7 +18,7 @@ export function useGetEmployeeDetails() {
     isPending,
     mutate: getEmployeeDetails,
   } = useMutation({
-    mutationFn: (value: string) => getEmployeeDetailsAPI(value),
+    mutationFn: (data:{value:string,zone:string,division:string}) => getEmployeeDetailsAPI(data),
     onSuccess(data) {
       if (data?.data !== "SUCCESS") {
         handleToast(data?.data);
@@ -86,5 +88,60 @@ export function useAddEmployee() {
     data,
     isPending,
     addEmployee,
+  };
+}
+export function useGetAllEmployees() {
+  const { handleToast } = useHandleApiResponse();
+
+  const {
+    data,
+    isPending,
+    mutate: getAllEmployees,
+  } = useMutation({
+    mutationFn: (data: any) => allEmployeeAPI(data),
+    onSuccess(data) {
+      if(data?.data !== "SUCCESS"){
+        handleToast(data?.data);
+      }
+    },
+    onError() {
+      handleToast("ERROR");
+    },
+  });
+
+  return {
+    data,
+    isPending,
+    getAllEmployees,
+  };
+}
+export function useEditEmployee() {
+  const { handleToast } = useHandleApiResponse();
+  const {dispatch} = useAppContext()
+
+  const {
+    data,
+    isPending,
+    mutate: editEmployee,
+  } = useMutation({
+    mutationFn: (data: any) => editEmployeeAPI(data),
+    onSuccess(data) {
+        handleToast(data?.data);
+        if(data?.data === "SUCCESS"){
+          dispatch({
+            type:"setRefresh",
+            payload:""
+          })
+        }
+    },
+    onError() {
+      handleToast("ERROR");
+    },
+  });
+
+  return {
+    data,
+    isPending,
+    editEmployee,
   };
 }

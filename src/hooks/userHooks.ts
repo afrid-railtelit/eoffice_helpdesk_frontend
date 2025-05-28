@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useHandleApiResponse } from "@/apiServices";
+import { useAppContext } from "@/apputils/AppContext";
 import {
   addUserAPI,
   changePasswordAPI,
@@ -49,7 +50,7 @@ export function useAddUser() {
       firstName: string;
       lastName: string;
       users: any;
-      level:number
+      level: number;
     }) => addUserAPI(data),
     onSuccess(data) {
       handleToast(data?.data);
@@ -145,6 +146,7 @@ export function useResetPassword() {
 }
 export function useGetZonesData() {
   const { handleToast } = useHandleApiResponse();
+  const { dispatch } = useAppContext();
 
   const {
     data,
@@ -155,6 +157,12 @@ export function useGetZonesData() {
     onSuccess(data) {
       if (data?.data !== "SUCCESS") {
         handleToast(data?.data);
+      }
+      if (data?.data === "SUCCESS") {
+        dispatch({
+          type: "setZonesData",
+          payload: data?.zones,
+        });
       }
     },
     onError() {

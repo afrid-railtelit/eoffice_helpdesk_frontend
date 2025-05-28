@@ -9,6 +9,7 @@ export type employeeDataType =  {
   email: string;
   mobile: string;
   employeeName: string;
+  division:string
 };
 export type issueDataType = {
   issueCode:string;

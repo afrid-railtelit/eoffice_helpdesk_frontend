@@ -1,62 +1,23 @@
-import { useAppContext } from "@/apputils/AppContext";
-import { useNavigate } from "react-router-dom";
-
 function DashboardMain() {
-  const navigate = useNavigate();
-  const { dispatch } = useAppContext();
   return (
-    <div className="p-6 bg-gray-100">
-      {/* Header */}
-      <div className="mb-4">
-        <h1 className="text-sm font-semibold">Welcome, Shaik afrid</h1>
-        <p className="text-gray-600">Role: Helpdesk Administrator</p>
+    <div className=" p-8 bg-gray-100 text-gray-800">
+      {/* Page Title */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">E-Office Help Desk</h1>
+        <p className="mt-2 text-gray-600">
+          Support and resources for your digital workplace
+        </p>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-4 rounded shadow">
-          <p className=" text-gray-500">Open Tickets</p>
-          <p className="text-sm font-bold">24</p>
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <p className=" text-gray-500">Tickets Resolved Today</p>
-          <p className="text-sm font-bold">18</p>
-        </div>
-      </div>
-
-      {/* Navigation Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div
-          onClick={() => {
-            navigate("/admin/users");
-            dispatch({
-              type: "setPage",
-              payload: {
-                title: "Manage Users",
-                desc: "Add, edit, or remove user accounts and permissions.",
-                index: 1,
-              },
-            });
-          }}
-          className="bg-white p-6 rounded shadow hover:bg-blue-50 cursor-pointer"
-        >
-          <h2 className="text-sm font-semibold">User Administration</h2>
-          <p className=" text-gray-600">Manage user accounts and roles.</p>
-        </div>
-        <div className="bg-white p-6 rounded shadow hover:bg-blue-50 cursor-pointer">
-          <h2 className="text-sm font-semibold">Ticket Management</h2>
-          <p className=" text-gray-600">View and manage support tickets.</p>
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      <div className="bg-white p-6 rounded shadow">
-        <h2 className="text-sm font-semibold mb-4">Recent Activity</h2>
-        <ul className=" text-gray-700">
-          <li>Ticket #1234 assigned to John Doe.</li>
-          <li>User Jane Smith added to the system.</li>
-          <li>System maintenance scheduled for 10 PM.</li>
-        </ul>
+      {/* Welcome Message */}
+      <div className="bg-white p-6 rounded-xl shadow mb-8">
+        <h2 className="text-xl font-semibold mb-2">Welcome!</h2>
+        <p className="text-sm text-gray-700 leading-relaxed">
+          This portal is designed to assist all employees with their e-office
+          technical and access issues. Whether it's login problems, software
+          installation requests, or general system guidance — our help desk is
+          here to support you.
+        </p>
       </div>
     </div>
   );

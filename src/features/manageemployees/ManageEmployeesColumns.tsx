@@ -1,59 +1,62 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { UserDataType } from "@/types/userDataTypes";
-import { formatDateTime } from "@/apputils/appUtils";
-import ManageUserActions from "./ManageEmployeeActions";
-import { MdVerified } from "react-icons/md";
-import { X } from "lucide-react";
+import { employeeDataType } from "@/types/employeeDataTypes";
+import ManageEmployee from "./ManageEmployeeActions";
 
-export const employeeColumns: ColumnDef<UserDataType>[] = [
+export const employeeColumns: ColumnDef<employeeDataType>[] = [
   {
-    accessorKey: "name",
-    header: "Name",
-    cell: ({ row }) => (
-      <p>{row?.original?.firstName + " " + (row?.original?.lastName ?? "")}</p>
-    ),
+    accessorKey: "zone",
+    header: "Zone",
   },
   {
-    accessorKey: "mobileNumber",
-    header: "Mobile Number",
+    accessorKey: "division",
+    header: "Division",
+  },
+
+  {
+    accessorKey: "employeeName",
+    header: "Employee name",
+  },
+
+  {
+    accessorKey: "employeeCode",
+    header: "Employee code",
   },
   {
-    accessorKey: "emailId",
+    accessorKey: "designation",
+    header: "Designation",
+  },
+  {
+    accessorKey: "email",
     header: "Email ID",
+    cell: ({ row }) => {
+      return <p>{row.original.email ? row.original.email : "-"}</p>;
+    },
   },
   {
-    accessorKey: "initialLogin",
-    header: "Email verified",
+    accessorKey: "dateOfBirth",
+    header: "Date of birth",
     cell: ({ row }) => {
       return (
-        <div>
-          {!row?.original?.initialLogin ? (
-            <div className="text-constructive flex items-center gap-1">
-              Verified <MdVerified className="text-constructive  w-4 h-4" />
-            </div>
-          ) : (
-            <div className="text-destructive flex items-center gap-1">
-              Not verified <X className="text-destructive w-4 h-4" />
-            </div>
-          )}
-        </div>
+        <p>
+          {row.original.dateOfBirth
+            ? row.original.dateOfBirth.split("T")[0]
+            : "-"}
+        </p>
       );
+    },
+  },
+  {
+    accessorKey: "mobile",
+    header: "Mobile Number",
+    cell: ({ row }) => {
+      return <p>{row.original.mobile ? row.original.mobile : "-"}</p>;
     },
   },
 
   {
-    accessorKey: "createdAt",
-    header: "Created at",
-    cell: ({ row }) => (
-      <p className="flex flex-col ">
-        <span>{formatDateTime(row?.getValue("createdAt")).date}</span>
-        <span>{formatDateTime(row?.getValue("createdAt")).time}</span>
-      </p>
-    ),
-  },
-  {
     accessorKey: "disabled",
     header: "Actions",
-    cell: ({ row }) => <ManageUserActions userData={row.original} />,
+    cell: ({ row }) => <ManageEmployee employeeData={row.original} />,
   },
+
 ];

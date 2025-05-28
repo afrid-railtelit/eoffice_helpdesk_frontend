@@ -4,7 +4,7 @@ import AppDialog from "@/apputils/AppDialog";
 import AppSpinner from "@/apputils/AppSpinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useDisableOrEnableUser, useGetZonesData } from "@/hooks/userHooks";
+import { useGetZonesData } from "@/hooks/userHooks";
 import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { RiUserAddLine } from "react-icons/ri";
@@ -18,56 +18,69 @@ import { useEffect, useState } from "react";
 import SearchableSelect, {
   searchableSelectDataType,
 } from "@/apputils/SearchableSelect";
-import { useAddEmployee } from "@/hooks/employeeHooks";
+import { useAddEmployee, useEditEmployee } from "@/hooks/employeeHooks";
+import { employeeDataType } from "@/types/employeeDataTypes";
 
 interface AddEmployeeDialogInterface {
   onClose: () => void;
   edit?: boolean;
-  userData?: UserDataType;
+  employeeData?: employeeDataType;
   data?: UserDataType[];
 }
 function AddEmployeeDialog({
   onClose,
   edit,
-  userData,
+  employeeData,
   data,
 }: AddEmployeeDialogInterface) {
-  const { handleSubmit, register, formState, watch, setValue } = useForm({});
+  const { handleSubmit, register, formState, watch, setValue } = useForm({
+    defaultValues: {
+      employeeCode: employeeData ? employeeData?.employeeCode : "",
+      employeeDesignation: employeeData ? employeeData?.designation : "",
+      employeeName: employeeData ? employeeData?.employeeName : "",
+      employeeEmail: employeeData ? employeeData?.email : "",
+      employeeMobile: employeeData ? employeeData?.mobile : "",
+      employeeOrganisationUnit: employeeData
+        ? employeeData?.organisationUnit
+        : "",
+      employeeDataOfBirth: employeeData
+        ? employeeData?.dateOfBirth.split("T")[0]
+        : "",
+      employeePost: employeeData ? employeeData?.post : "",
+      division: employeeData ? employeeData?.division : "",
+      zone: employeeData ? employeeData?.zone : "",
+    },
+  });
   const { errors } = formState;
 
   const { addEmployee, isPending } = useAddEmployee();
-  const { editUser, isPending: editUserPending } = useDisableOrEnableUser();
 
-  const { dispatch } = useAppContext();
+  const { dispatch, zonesData: zonesMainData } = useAppContext();
   const [selectedFile, setSelectedFile] = useState<File>();
   const [fileData, setFileData] = useState([]);
-  const [selectedLevel, setSelectedLevel] = useState<string>("1");
-  const {
-    getZonesData,
-    data: zonesData,
-    isPending: gettingZonesData,
-  } = useGetZonesData();
+  const { getZonesData, isPending: gettingZonesData } = useGetZonesData();
   const [selectedZone, setSelectedZone] = useState<searchableSelectDataType>();
   const [divisionsData, setDivisionsData] = useState<divisionDataType[]>([]);
   const [selectedDivision, setSelectedDivision] =
     useState<searchableSelectDataType>();
   const [divisionClear, setDivisionClear] = useState<boolean>(false);
+  const { editEmployee, isPending: editEmployeePending } = useEditEmployee();
 
   useEffect(() => {
-    if (edit) {
-      if (userData) {
-        setSelectedLevel(userData?.level?.toString());
-      }
+    if (edit && employeeData) {
+      setSelectedDivision(employeeData?.division as any);
+      setSelectedZone(employeeData?.zone as any);
+      setValue("zone", employeeData?.zone);
+      setValue("division", employeeData?.division);
     }
 
-    getZonesData();
+    if (zonesMainData?.length === 0) getZonesData();
   }, [edit]);
 
   function handleZoneSelectDataType(item: searchableSelectDataType) {
-    for (let index = 0; index < zonesData?.zones?.length; index++) {
-      if (zonesData?.zones[index].id === item?.value) {
-        console.log(zonesData?.zones[index]);
-        setDivisionsData(zonesData?.zones[index]?.divisions);
+    for (let index = 0; index < zonesMainData?.length; index++) {
+      if (zonesMainData[index].id === item?.value) {
+        setDivisionsData(zonesMainData[index]?.divisions);
       }
     }
     setValue("zone", item?.value);
@@ -98,14 +111,9 @@ function AddEmployeeDialog({
       );
     else {
       {
-        editUser(
+        editEmployee(
           {
-            emailId: e?.email,
-            method: "editUser",
-            userData: {
-              ...e,
-              level: selectedLevel,
-            },
+            ...e,
           },
           {
             onSuccess(data) {
@@ -126,7 +134,7 @@ function AddEmployeeDialog({
   return (
     <>
       <AppSpinner
-        isPending={isPending || editUserPending || gettingZonesData}
+        isPending={isPending || editEmployeePending || gettingZonesData}
       />
       <AppDialog onClose={onClose} placement="CENTER" title="Add user">
         <form
@@ -183,7 +191,7 @@ function AddEmployeeDialog({
                   required: false,
                 },
                 {
-                  value: "post",
+                  value: "Post",
                   required: false,
                 },
               ]}
@@ -194,9 +202,12 @@ function AddEmployeeDialog({
           {!selectedFile && (
             <div className="flex flex-col gap-3">
               <SearchableSelect
+                value={edit && selectedZone as any}
+                isDisabled={edit}
+                mandatory
                 onSelect={handleZoneSelectDataType}
                 label="Select Zone"
-                data={zonesData?.zones.map((item: zoneDataType) => {
+                data={zonesMainData?.map((item: zoneDataType) => {
                   return {
                     key: item?.zoneCode + " - " + item?.zoneName,
                     value: item?.id,
@@ -209,8 +220,10 @@ function AddEmployeeDialog({
                 icon="zone"
               />
               <SearchableSelect
+                value={edit &&selectedDivision as any}
+                mandatory
                 clear={divisionClear}
-                isDisabled={!selectedZone}
+                isDisabled={!selectedZone || edit}
                 onSelect={(item) => {
                   setSelectedDivision(item);
                   setValue("division", item.value);
@@ -235,6 +248,7 @@ function AddEmployeeDialog({
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-3">
                 <Input
+                  disabled={edit}
                   value={watch("employeeCode") ?? ""}
                   className="lg:w-[20vw]"
                   placeholder="Employee code"
@@ -246,6 +260,7 @@ function AddEmployeeDialog({
                   })}
                 />
                 <Input
+                  disabled={edit}
                   value={watch("employeeDesignation") ?? ""}
                   className="lg:w-[20vw]"
                   placeholder="Employee designation"
@@ -269,6 +284,7 @@ function AddEmployeeDialog({
                 />
 
                 <Input
+                  disabled={edit}
                   value={watch("employeeEmail") ?? ""}
                   className="lg:w-[20vw]"
                   placeholder="Employee email"
@@ -293,14 +309,11 @@ function AddEmployeeDialog({
                   type="number"
                   errorMessage={errors?.employeeMobile?.message}
                   {...register("employeeMobile", {
-                    required: "Please enter Employee Mobile number",
-                    pattern: {
-                      value: /^[6-9]\d{9}$/,
-                      message: "Invalid mobile number format",
-                    },
+                    required: false,
                   })}
                 />
                 <Input
+                  disabled={edit}
                   value={watch("employeeDataOfBirth") ?? ""}
                   className="lg:w-[20vw]"
                   placeholder="Employee date of birth"

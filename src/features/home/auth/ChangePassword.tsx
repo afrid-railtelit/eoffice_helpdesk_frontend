@@ -42,7 +42,7 @@ function ChangePassword() {
                 index: 2,
               },
             });
-            navigate("/tickets");
+            navigate("/dashboard");
           }
         },
       }

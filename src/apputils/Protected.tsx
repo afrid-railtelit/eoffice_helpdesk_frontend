@@ -17,6 +17,8 @@ function Protected() {
     }
   }, []);
 
+
+
   return (
     <div className="w-full h-full  flex flex-col">
       <NavBar />

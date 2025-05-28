@@ -6,7 +6,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
 
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RiSearchLine } from "react-icons/ri";
 import { newTicketDialogColumn } from "./newticketdialog/NewTicketDialogColumns";
 import { ColumnFilter } from "@tanstack/react-table";
@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useGetEmployeeDetails } from "@/hooks/employeeHooks";
+import { useGetEmployeeDetails, useGetIssuesData } from "@/hooks/employeeHooks";
 import AppSpinner from "@/apputils/AppSpinner";
 import { employeeDataType } from "@/types/employeeDataTypes";
 import SearchableSelect, {
@@ -27,8 +27,9 @@ import SearchableSelect, {
 } from "@/apputils/SearchableSelect";
 import { useAppContext } from "@/apputils/AppContext";
 import { LuAsterisk } from "react-icons/lu";
-import { useRaiseNewTicket } from "@/hooks/userHooks";
+import { useGetZonesData, useRaiseNewTicket } from "@/hooks/userHooks";
 import { useGetEmailId } from "@/hooks/appHooks";
+import { divisionDataType, zoneDataType } from "@/types/userDataTypes";
 
 interface NewTicketDialogInterface {
   onClose: () => void;
@@ -53,15 +54,37 @@ function NewTicketDialog({ onClose }: NewTicketDialogInterface) {
   const [issueTypeError, setIssueTypeError] = useState<string>("");
   const { isPending: raisingNewTicket, raiseNewTicket } = useRaiseNewTicket();
   const myEmailId = useGetEmailId();
-  const { dispatch } = useAppContext();
+  const { dispatch, zonesData } = useAppContext();
+  const { getZonesData, isPending: gettingZonesData } = useGetZonesData();
+  const [selectedZone, setSelectedZone] = useState<string>("");
+  const [divisionsData, setDivisionsData] = useState<divisionDataType[]>([]);
+  const [selectedDivision, setSelectedDivision] = useState<string>("");
+  const [divisionClear, setDivisionClear] = useState<boolean>(false);
+  const [zoneClear, setZoneClear] = useState<boolean>(false);
+  const { zonesData: zonesMainData } = useAppContext();
+  const { getIssuesData, isPending: gettingIssueData } = useGetIssuesData();
+
+  useEffect(() => {
+    if (zonesData?.length === 0) {
+      getZonesData();
+    }
+    if (issuesData?.length === 0) getIssuesData();
+  }, []);
 
   function handleGetEmployeeDetails() {
     if (searchedValue) {
-      getEmployeeDetails(searchedValue?.trim(), {
-        onSuccess(data) {
-          setData(data?.employee);
+      getEmployeeDetails(
+        {
+          value: searchedValue?.trim(),
+          zone: selectedZone,
+          division: selectedDivision,
         },
-      });
+        {
+          onSuccess(data) {
+            setData(data?.employee);
+          },
+        }
+      );
     }
   }
 
@@ -112,14 +135,77 @@ function NewTicketDialog({ onClose }: NewTicketDialogInterface) {
     setSelectedIssueCriticalLevel("");
     setData(undefined);
     setSearchedValue("");
+
+    setZoneClear(true);
+    setDivisionClear(true);
+    setSelectedDivision("");
+    setSelectedZone("");
+    setTimeout(() => {
+      setZoneClear(false);
+      setDivisionClear(false);
+    }, 50);
+  }
+
+  function handleZoneSelectDataType(item: searchableSelectDataType) {
+    const zoneCode = item.value.split("#");
+    for (let index = 0; index < zonesMainData?.length; index++) {
+      if (zonesMainData[index].id === zoneCode[0]) {
+        setDivisionsData(zonesMainData[index]?.divisions);
+      }
+    }
+    setSelectedZone(zoneCode[1]);
+    setSelectedDivision("");
+    setDivisionClear(true);
+    setTimeout(() => {
+      setDivisionClear(false);
+    }, 50);
   }
 
   return (
     <div>
-      {<AppSpinner isPending={isPending || raisingNewTicket} />}
+      {
+        <AppSpinner
+          isPending={
+            isPending ||
+            raisingNewTicket ||
+            gettingZonesData ||
+            gettingIssueData
+          }
+        />
+      }
       <AppDialog onClose={onClose} placement="CENTER" title="New Ticket">
         <div className=" min-w-[70vw]">
           <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
+              <SearchableSelect
+                clear={zoneClear}
+                onSelect={handleZoneSelectDataType}
+                label="Select Zone"
+                data={zonesMainData?.map((item: zoneDataType) => {
+                  return {
+                    key: item?.zoneCode + " - " + item?.zoneName,
+                    value: item?.id + "#" + item.zoneCode,
+                  };
+                })}
+                icon="zone"
+              />
+              <SearchableSelect
+                clear={divisionClear}
+                isDisabled={!selectedZone}
+                onSelect={(item) => {
+                  setSelectedDivision(item?.value);
+                }}
+                label="Select Division"
+                data={divisionsData?.map((item: divisionDataType) => {
+                  return {
+                    key: item?.divisionCode + " - " + item?.divisionName,
+                    value: item?.divisionCode,
+                  };
+                })}
+                icon="division"
+              />
+            </div>
+
             <div className="lg:w-[20vw]">
               <Input
                 className="lg:w-[20vw]"
@@ -129,7 +215,14 @@ function NewTicketDialog({ onClose }: NewTicketDialogInterface) {
                   const value = e?.target?.value;
                   setSearchedValue(value);
                 }}
-                onClear={handleClear}
+                onClear={() => {
+                  setSelectedIssueType(undefined);
+                  setIssueCriticalLevelError("");
+                  setIssueTypeError("");
+                  setSelectedIssueCriticalLevel("");
+                  setData(undefined);
+                  setSearchedValue("");
+                }}
                 noErrorMessage={true}
                 about="Search by Employee Code or Email "
                 placeholder="Search by Employee Code or Email "
@@ -150,7 +243,7 @@ function NewTicketDialog({ onClose }: NewTicketDialogInterface) {
           </div>
           <div>
             {data && searchedValue && (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 mt-4">
                 <DataTable
                   columns={newTicketDialogColumn}
                   totalPages={1}

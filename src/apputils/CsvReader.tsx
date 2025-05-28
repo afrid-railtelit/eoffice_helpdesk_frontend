@@ -51,7 +51,6 @@ function CsvReader({
                 !data[i][fileHeaders[index].value] &&
                 fileHeaders[index].required
               ) {
-                console.log(fileHeaders[index])
                 setErrorMessage(
                   "File headers do not match the required format. Please download the template and re-upload."
                 );

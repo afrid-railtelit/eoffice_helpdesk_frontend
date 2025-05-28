@@ -22,83 +22,118 @@ export async function postAPI(url: string, payload: any) {
 
 export function useHandleApiResponse() {
   const responseData = [
-    { data: "SUCCESS", message: "Success", variant: "constructive" },
+    {
+      data: "SUCCESS",
+      message: "Success",
+      description: "Your action was completed successfully.",
+      variant: "constructive",
+    },
+    {
+      data: "OTP_SUCCESS",
+      message: "OTP Verified",
+      description: "You’ve successfully verified the OTP.",
+      variant: "constructive",
+    },
+    {
+      data: "OTP_SENT",
+      message: "OTP Sent",
+      description: "Check your inbox for the verification code.",
+      variant: "constructive",
+    },
     {
       data: "DISABLED",
-      message: "Account has been disabled",
+      message: "Account Disabled",
+      description: "Your account has been disabled. Please contact support.",
       variant: "destructive",
     },
-    { data: "OTP_SUCCESS", message: "Success", variant: "constructive" },
-    { data: "ERROR", message: "Something went wrong", variant: "destructive" },
+    {
+      data: "ERROR",
+      message: "Error",
+      description: "Something went wrong. Please try again later.",
+      variant: "destructive",
+    },
     {
       data: "UNAUTHORIZED",
-      message: "You are not authorized",
+      message: "Unauthorized",
+      description: "You do not have permission to perform this action.",
       variant: "destructive",
     },
     {
       data: "WRONG_PASSWORD",
-      message: "Incorrect password",
+      message: "Incorrect Password",
+      description: "The password you entered is incorrect.",
       variant: "destructive",
     },
-    { data: "BAD_REQUEST", message: "Bad request", variant: "destructive" },
+    {
+      data: "BAD_REQUEST",
+      message: "Bad Request",
+      description: "The request was invalid. Please check and try again.",
+      variant: "destructive",
+    },
     {
       data: "USER_EXISTS",
-      message: "User already exists",
+      message: "User Exists",
+      description: "A user with this information already exists.",
       variant: "destructive",
     },
     {
       data: "INVALID_EMAIL_ID",
-      message: "Invalid email address",
+      message: "Invalid Email",
+      description: "The email address provided is not valid.",
       variant: "destructive",
     },
     {
       data: "INVALID_MOBILE_NUMBER",
-      message: "Invalid mobile number",
+      message: "Invalid Mobile Number",
+      description: "The mobile number provided is not valid.",
       variant: "destructive",
     },
     {
       data: "SERVER_ERROR",
-      message: "Internal server error",
+      message: "Server Error",
+      description: "Internal server error. Please try again later.",
       variant: "destructive",
     },
     {
-      data: "OTP_SENT",
-      message: "OTP has been sent to your Email address",
-      variant: "constructive",
+      data: "INVALID_OTP",
+      message: "Invalid OTP",
+      description: "The OTP you entered is invalid or expired.",
+      variant: "destructive",
     },
-    { data: "INVALID_OTP", message: "Invalid OTP", variant: "destructive" },
     {
       data: "USER_NOT_FOUND",
-      message: "User not found",
+      message: "User Not Found",
+      description: "No user found matching your credentials.",
       variant: "destructive",
     },
-
     {
       data: "EMPLOYEE_NOT_FOUND",
-      message: "Employee not found",
+      message: "Employee Not Found",
+      description: "No employee found with the given details.",
       variant: "destructive",
     },
-
     {
       data: "INVALID_NAME",
-      message: "Please enter a valid name",
+      message: "Invalid Name",
+      description: "Please enter a valid name.",
       variant: "destructive",
     },
     {
       data: "INVALID_USER_LOGIN_TYPE",
-      message:
-        "This account is registered with Google Sign-In. Please use Google to log in.",
+      message: "Login Type Error",
+      description: "This account is registered with Google Sign-In. Please use Google login.",
       variant: "destructive",
     },
     {
       data: "INVALID_USER_LOGIN_TYPE_GOOGLE",
-      message:
-        "This account is not linked with Google Sign-In. Please log in using your email and password.",
+      message: "Login Type Error",
+      description: "This account is not linked with Google Sign-In. Please login with email/password.",
       variant: "destructive",
     },
     {
       data: "LINK_EXPIRED",
-      message: "This link has expired. Please request a new one.",
+      message: "Link Expired",
+      description: "This link has expired. Please request a new one.",
       variant: "destructive",
     },
   ];
@@ -106,19 +141,15 @@ export function useHandleApiResponse() {
   const { toast } = useToast();
 
   function handleToast(data: string) {
-    for (let index = 0; index < responseData.length; index++) {
-      if (responseData[index].data === data) {
-        toast({
-          title: responseData[index].message,
-          variant: responseData[index].variant as
-            | "constructive"
-            | "destructive"
-            | "default",
-        });
-
-        break;
-      }
+    const response = responseData.find((item) => item.data === data);
+    if (response) {
+      toast({
+        title: response.message,
+        description: response.description,
+        variant: response.variant as "constructive" | "destructive" | "default",
+      });
     }
   }
+
   return { handleToast };
 }

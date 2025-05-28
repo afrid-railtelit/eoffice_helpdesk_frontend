@@ -3,6 +3,10 @@ import { useAppContext } from "@/apputils/AppContext";
 import { lastLoginType } from "@/types/userDataTypes";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { FaUsers, FaTicketAlt, FaChartBar } from "react-icons/fa";
+import { MdOutlineDashboard } from "react-icons/md";
+import { FaUserTie } from "react-icons/fa";
+
 
 export function useGetrole() {
   const role = localStorage.getItem("rcilRole");
@@ -21,11 +25,18 @@ export function useGetEmailId() {
   const emailId = localStorage.getItem("rcilEmailId");
   return emailId;
 }
-export function useGetLastLoginDetails() {
-  const loginDetails:lastLoginType | string = localStorage.getItem("rcilLastLoginDetails") as any;
-  if(loginDetails !== "undefined") return JSON.parse(loginDetails as any);
-  else return undefined
+export function useGetUserLevel() {
+  const level = localStorage.getItem("rcilLevel");
+  return level ? parseInt(level) : 1;
 }
+export function useGetLastLoginDetails() {
+  const loginDetails: lastLoginType | string = localStorage.getItem(
+    "rcilLastLoginDetails"
+  ) as any;
+  if (loginDetails !== "undefined") return JSON.parse(loginDetails as any);
+  else return undefined;
+}
+
 
 
 export function useUpdatePage() {
@@ -33,42 +44,68 @@ export function useUpdatePage() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (pathname === "/tickets" || pathname === "/admin/tickets") {
+    // Normalize pathname by removing the "/admin" prefix if present
+    const normalizedPath = pathname.startsWith("/admin")
+      ? pathname.slice("/admin".length)
+      : pathname;
+
+    // Find matching menu item by path (exact match)
+    const matchedItem = menuItems.find(
+      (item) => item.path === normalizedPath
+    );
+
+    if (matchedItem) {
       dispatch({
         type: "setPage",
         payload: {
-          title: "Tickets",
-          desc: "View and manage support tickets and more...",
-          index: 2,
-        },
-      });
-    } else if (pathname === "/reports" || pathname === "/admin/reports") {
-      dispatch({
-        type: "setPage",
-        payload: {
-          title: "Reports",
-          desc: "Generate and view system usage and performance reports.",
-          index: 3,
-        },
-      });
-    } else if (pathname === "/users" || pathname === "/admin/users") {
-      dispatch({
-        type: "setPage",
-        payload: {
-          title: "Manage Users",
-          desc: "Add, edit, or remove user accounts and permissions.",
-          index: 1,
-        },
-      });
-    } else if (pathname === "/dashboard" || pathname === "/admin/dashboard") {
-      dispatch({
-        type: "setPage",
-        payload: {
-          title: "Dashboard",
-          desc: "Overview of system metrics and quick actions.",
-          index: 0,
+          title: matchedItem.label,
+          desc: matchedItem.description,
+          index: matchedItem.indexPath,
         },
       });
     }
-  }, [pathname]);
+  }, [pathname, dispatch]);
 }
+
+export const menuItems = [
+    {
+      label: "Dashboard",
+      icon: MdOutlineDashboard,
+      indexPath: 0,
+      path: "/dashboard",
+      description: "Overview of system metrics and quick actions.",
+    },
+    {
+      label: "Manage Users",
+      icon: FaUsers,
+      indexPath: 1,
+      path: "/users",
+      description: "Add, edit, or remove user accounts and permissions.",
+      role: "ADMIN",
+    },
+    {
+      label: "Tickets",
+      icon: FaTicketAlt,
+      indexPath: 2,
+      path: "/tickets",
+      description: "View and manage support tickets and more...",
+      role: "EMPLOYEE",
+    },
+    {
+      label: "Reports",
+      icon: FaChartBar,
+      indexPath: 3,
+      path: "/reports",
+      description: "Generate and view system usage and performance reports.",
+      role: "ADMIN",
+    },
+
+    {
+      label: "Manage Employees",
+      icon: FaUserTie, 
+      indexPath: 4,
+      path: "/employees",
+      description: "Add, edit, and manage employee records and access.",
+      level:2
+    },
+  ];

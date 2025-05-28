@@ -14,7 +14,7 @@ import { ColumnFiltersState } from "@tanstack/react-table";
 function ManageUserMain() {
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 5,
+    pageSize: 10,
   });
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [openAddUser, setOpenAdduser] = useState<boolean>(false);

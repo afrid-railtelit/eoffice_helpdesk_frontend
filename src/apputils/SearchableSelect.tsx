@@ -20,7 +20,9 @@ interface SearchableSelectInterface {
   name?: string;
   error?: string;
   clear?: boolean;
-  icon?:string
+  icon?: string;
+  mandatory?: boolean;
+  value?: string;
 }
 
 function SearchableSelect({
@@ -33,7 +35,9 @@ function SearchableSelect({
   register,
   error,
   clear,
-  icon
+  icon,
+  mandatory,
+  value,
 }: SearchableSelectInterface) {
   const [clickedInput, setClickedInput] = useState<boolean>(false);
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
@@ -49,7 +53,10 @@ function SearchableSelect({
     if (clear) {
       setInputValue("");
     }
-  }, [data, clear]);
+    if (value) {
+      setInputValue(value ? value : "");
+    }
+  }, [data, clear, value]);
 
   function handleSelectItem(item: searchableSelectDataType) {
     setInputValue(item.key);
@@ -99,9 +106,11 @@ function SearchableSelect({
         }}
       >
         <Input
-          {...register(name, {
-            required: error,
-          })}
+          {...(register &&
+            register(name, {
+              required: error,
+            }))}
+          mandatory={mandatory}
           className=" lg:w-[20vw] "
           onBlur={() => setClickedInput(false)}
           onChange={handleSearch}
@@ -114,16 +123,21 @@ function SearchableSelect({
           aria-label={label}
           errorMessage={errorMessage}
           icon={icon}
+          noErrorMessage={!error}
         />
         {!clickedInput ? (
-          <IoIosArrowDown className="absolute right-2 w-4 h-4   " />
+          <IoIosArrowDown
+            className={`absolute right-2.5 w-4 h-4 ${error && "top-3"} ${isDisabled &&"text-foreground/30"}   `}
+          />
         ) : (
-          <MdOutlineKeyboardArrowUp className="absolute right-2 w-5 h-5   " />
+          <MdOutlineKeyboardArrowUp
+            className={`absolute right-2 w-5 h-5   ${error && "top-3"} ${isDisabled &&"text-foreground/30"}`}
+          />
         )}
       </div>
 
       <div
-        className={`fixed bg-white mt-1 w-[20vw] border border-gray-300 rounded-md shadow-lg transform transition-all duration-300  origin-top z-[60]  ${
+        className={`fixed bg-white mt-1 ${mandatory && "-ml-2"} w-[20vw] border border-gray-300 rounded-md shadow-lg transform transition-all duration-300  origin-top z-[60]  ${
           clickedInput
             ? "opacity-100 scale-y-100 max-h-60 overflow-y-auto"
             : "opacity-0 scale-y-0 max-h-0 overflow-hidden"

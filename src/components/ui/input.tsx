@@ -59,26 +59,21 @@ const Input = React.forwardRef<HTMLInputElement, InputInterface>(
 
         case "employeecode":
           return <LuBookUser className="w-5 h-5" />;
-        
+
         case "tie":
-          return <GiTie  className="w-5 h-5" />;
-        
+          return <GiTie className="w-5 h-5" />;
+
         case "zone":
-          return <BsTrainLightrailFront  className="w-5 h-5" />;
-          
+          return <BsTrainLightrailFront className="w-5 h-5" />;
+
         case "division":
-          return <GiRailRoad   className="w-5 h-5" />;
-          
+          return <GiRailRoad className="w-5 h-5" />;
+
         case "organisaton":
-          return <CgOrganisation    className="w-5 h-5" />;
-          
+          return <CgOrganisation className="w-5 h-5" />;
+
         case "post":
-          return <CiSignpostDuo1     className="w-5 h-5" />;
-
-
-
-        
-        
+          return <CiSignpostDuo1 className="w-5 h-5" />;
       }
     }
 
@@ -102,21 +97,28 @@ const Input = React.forwardRef<HTMLInputElement, InputInterface>(
               </label>
             )}
 
-            <div className="absolute pl-1">{getIcon()}</div>
-            <input
-              autoComplete="off"
-              ref={ref} // Pass ref here
-              type={type}
-              data-slot="input"
-              className={cn(
-                " file:text-foreground placeholder:text-xs placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-border flex h-10 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm ",
-                "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[1px]",
-                "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-                `${icon && "pl-7"}`,
-                className
+            <div className={`absolute pl-1 ${props.disabled?"text-foreground/40":"text-foreground"} `}>{getIcon()}</div>
+            <div className="w-full flex  items-center">
+              <input
+                autoComplete="off"
+                ref={ref} // Pass ref here
+                type={type}
+                data-slot="input"
+                className={cn(
+                  " file:text-foreground placeholder:text-xs placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-border flex h-10 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm ",
+                  "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[1px]",
+                  "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+                  `${icon && "pl-7"}`,
+                  className
+                )}
+                {...props}
+              />
+              {mandatory && !label && (
+                <span className="w-3 h-3">
+                  <LuAsterisk className={`w-3  h-3  text-destructive ${props?.disabled && "text-destructive/30"}`} />
+                </span>
               )}
-              {...props}
-            />
+            </div>
             {onClear && props?.value && (
               <div
                 className="absolute  right-2 cursor-pointer w-5 h-5 bg-gray-100 lg:hover:bg-gray-300 flex items-center justify-center rounded-full"

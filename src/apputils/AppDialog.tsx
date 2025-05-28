@@ -16,46 +16,38 @@ export default function AppDialog({
   noClose,
   placement = "CENTER",
 }: AppDialogProps) {
-  const [visible, setVisible] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [show, setShow] = useState(false); // controls animation state
 
   useEffect(() => {
-    // Show dialog on mount, then trigger animation on next frame
-    setVisible(true);
-    requestAnimationFrame(() => {
-      setIsAnimating(true);
+    // Trigger entry animation after component mounts
+    const timeout = setTimeout(() => {
+      setShow(true);
       document.body.style.overflow = "hidden";
-    });
+    }, 10); // let initial render finish
 
     return () => {
+      clearTimeout(timeout);
       document.body.style.overflow = "";
     };
   }, []);
 
-  function closeDialog() {
-    setIsAnimating(false);
-
+  const handleClose = () => {
+    setShow(false);
     setTimeout(() => {
-      setVisible(false);
-      onClose();
-      document.body.style.overflow = "";
-    }, 350); // match updated transition duration
-  }
-
-  if (!visible) return null;
+      onClose(); // unmount parent
+    }, 300); // match transition duration
+  };
 
   return (
     <>
       {/* Overlay */}
       <div
-        onClick={() => {
-          if (!noClose) {
-            closeDialog();
-          }
-        }}
-        className={`fixed inset-0 bg-black/60 backdrop-blur-xs bg-opacity-50  z-[50] transition-opacity duration-350 ease-out ${
-          isAnimating ? "opacity-100" : "opacity-0"
+        className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ease-out ${
+          show ? "opacity-100" : "opacity-0"
         }`}
+        onClick={() => {
+          if (!noClose) handleClose();
+        }}
       />
 
       {/* Dialog */}
@@ -63,49 +55,40 @@ export default function AppDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="dialog-title"
-        className={`fixed z-[50] bg-white shadow-lg rounded-md flex flex-col
-          transition-transform duration-350 ease-out w-[95vw] h-[95vh] lg:w-fit lg:h-fit
+        className={`fixed z-50 bg-white shadow-xl rounded-lg flex flex-col max-w-[95vw] max-h-[95vh] w-full sm:w-auto transition-all duration-300 ease-out
           ${
             placement === "RIGHT"
-              ? "top-0 right-0 h-full "
-              : "top-1/2 left-1/2 max-h-[95vh]   -translate-x-1/2 -translate-y-1/2"
-          }
-          ${isAnimating ? "opacity-100" : "opacity-0"}
-          ${
-            placement === "RIGHT"
-              ? isAnimating
-                ? "translate-x-0"
-                : "translate-x-full"
-              : isAnimating
-              ? "scale-100"
-              : "scale-95"
+              ? `top-0 right-0 h-full transform ${
+                  show ? "translate-x-0" : "translate-x-full"
+                }`
+              : `top-1/2 left-1/2 transform ${
+                  show
+                    ? "-translate-x-1/2 -translate-y-1/2 opacity-100"
+                    : "-translate-x-1/2 -translate-y-[40%] opacity-0"
+                }`
           }
         `}
         style={{
           transformOrigin: placement === "RIGHT" ? "top right" : "center",
-          willChange: "transform, opacity",
         }}
       >
         {/* Header */}
-        <header className="flex items-center justify-between px-4 py-3 border-b border-gray-200 flex-shrink-0">
-          <h2
-            id="dialog-title"
-            className="text-lg font-semibold text-gray-900 select-none"
-          >
+        <header className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+          <h2 id="dialog-title" className="text-lg font-semibold text-gray-900">
             {title}
           </h2>
           {!noClose && (
             <button
               aria-label="Close dialog"
-              onClick={closeDialog}
-              className="text-gray-600 hover:text-gray-900 transition cursor-pointer"
+              onClick={handleClose}
+              className="text-gray-600 hover:text-gray-900 transition"
             >
               <X size={20} />
             </button>
           )}
         </header>
 
-        {/* Scrollable content */}
+        {/* Content */}
         <div className="p-4 overflow-auto flex-1">{children}</div>
       </div>
     </>

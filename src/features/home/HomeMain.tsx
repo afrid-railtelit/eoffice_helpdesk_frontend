@@ -8,32 +8,22 @@ function HomeMain() {
   const loggedIn = localStorage.getItem("rcilEmailId");
   const role = localStorage.getItem("rcilRole");
   const navigate = useNavigate();
-  const {dispatch} = useAppContext()
+  const { dispatch } = useAppContext();
 
   useEffect(() => {
     if (loggedIn) {
+      dispatch({
+        type: "setPage",
+        payload: {
+          title: "Dashboard",
+          desc: "Overview of system metrics and quick actions.",
+          index: 0,
+        },
+      });
       if (role === "ADMIN") {
-        dispatch({
-          type:"setPage",
-          payload:{
-            title:"Dashboard",
-            desc:"Overview of system metrics and quick actions.",
-            index:0
-          }
-        })
         navigate("/admin/dashboard");
-        
       } else {
-        dispatch({
-          type:"setPage",
-          payload:{
-            title:"Tickets",
-            desc:"View and manage support tickets and more...",
-            index:2
-          }
-        })
-        navigate("/tickets");
-        
+        navigate("/dashboard");
       }
     }
   }, []);

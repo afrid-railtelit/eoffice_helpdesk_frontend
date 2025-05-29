@@ -224,8 +224,8 @@ function NewTicketDialog({ onClose }: NewTicketDialogInterface) {
                   setSearchedValue("");
                 }}
                 noErrorMessage={true}
-                about="Search by Employee Code or Email "
-                placeholder="Search by Employee Code or Email "
+                about="Search by Employee code,email or mobile number.."
+                placeholder="Search by Employee code,email or mobile number.."
               />
             </div>
             <Button

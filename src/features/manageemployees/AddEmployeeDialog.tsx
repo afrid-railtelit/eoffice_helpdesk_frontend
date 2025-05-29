@@ -72,6 +72,14 @@ function AddEmployeeDialog({
       setSelectedZone(employeeData?.zone as any);
       setValue("zone", employeeData?.zone);
       setValue("division", employeeData?.division);
+      for (let index = 0; index < zonesMainData?.length; index++) {
+        if (
+          zonesMainData[index]?.zoneCode?.trim()?.toLowerCase() ===
+          employeeData?.zone?.trim()?.toLowerCase()
+        ) {
+          setDivisionsData(zonesMainData[index]?.divisions);
+        }
+      }
     }
 
     if (zonesMainData?.length === 0) getZonesData();
@@ -79,7 +87,8 @@ function AddEmployeeDialog({
 
   function handleZoneSelectDataType(item: searchableSelectDataType) {
     for (let index = 0; index < zonesMainData?.length; index++) {
-      if (zonesMainData[index].id === item?.value) {
+      if (zonesMainData[index].zoneCode?.trim() === item?.value) {
+        console.log(zonesMainData[index])
         setDivisionsData(zonesMainData[index]?.divisions);
       }
     }
@@ -202,15 +211,14 @@ function AddEmployeeDialog({
           {!selectedFile && (
             <div className="flex flex-col gap-3">
               <SearchableSelect
-                value={edit && selectedZone as any}
-                isDisabled={edit}
+                value={edit && !selectedZone?.key && (selectedZone as any)}
                 mandatory
                 onSelect={handleZoneSelectDataType}
                 label="Select Zone"
                 data={zonesMainData?.map((item: zoneDataType) => {
                   return {
                     key: item?.zoneCode + " - " + item?.zoneName,
-                    value: item?.id,
+                    value: item?.zoneCode?.trim(),
                   };
                 })}
                 register={register}
@@ -220,10 +228,12 @@ function AddEmployeeDialog({
                 icon="zone"
               />
               <SearchableSelect
-                value={edit &&selectedDivision as any}
+                value={
+                  edit && !selectedDivision?.key && (selectedDivision as any)
+                }
                 mandatory
                 clear={divisionClear}
-                isDisabled={!selectedZone || edit}
+                isDisabled={!selectedZone}
                 onSelect={(item) => {
                   setSelectedDivision(item);
                   setValue("division", item.value);
@@ -238,17 +248,16 @@ function AddEmployeeDialog({
                 icon="division"
                 register={register}
                 error="Please select division"
-                errorMessage={errors?.zone?.message as any}
+                errorMessage={errors?.division?.message as any}
                 name="division"
               />
             </div>
           )}
 
-          {!selectedFile && selectedZone && selectedDivision && (
+          {((!selectedFile && selectedZone && selectedDivision) || edit) && (
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-3">
                 <Input
-                  disabled={edit}
                   value={watch("employeeCode") ?? ""}
                   className="lg:w-[20vw]"
                   placeholder="Employee code"
@@ -260,7 +269,6 @@ function AddEmployeeDialog({
                   })}
                 />
                 <Input
-                  disabled={edit}
                   value={watch("employeeDesignation") ?? ""}
                   className="lg:w-[20vw]"
                   placeholder="Employee designation"
@@ -284,7 +292,6 @@ function AddEmployeeDialog({
                 />
 
                 <Input
-                  disabled={edit}
                   value={watch("employeeEmail") ?? ""}
                   className="lg:w-[20vw]"
                   placeholder="Employee email"
@@ -313,7 +320,6 @@ function AddEmployeeDialog({
                   })}
                 />
                 <Input
-                  disabled={edit}
                   value={watch("employeeDataOfBirth") ?? ""}
                   className="lg:w-[20vw]"
                   placeholder="Employee date of birth"

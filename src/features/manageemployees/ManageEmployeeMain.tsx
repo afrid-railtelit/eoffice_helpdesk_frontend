@@ -23,7 +23,6 @@ function ManageEmployeeMain() {
   });
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [openAddUser, setOpenAdduser] = useState<boolean>(false);
-  const { refresh } = useAppContext();
   const { isPending, getAllEmployees, data } = useGetAllEmployees();
   const {
     getZonesData,
@@ -35,7 +34,7 @@ function ManageEmployeeMain() {
   const [divisionClear, setDivisionClear] = useState<boolean>(false);
   const [zoneClear, setZoneClear] = useState<boolean>(false);
   const [searchedValue, setSearchedValue] = useState<string>("");
-  const { zonesData: zonesMainData } = useAppContext();
+  const { zonesData: zonesMainData,refresh } = useAppContext();
 
   useEffect(() => {
     if (selectedDivision && selectedZone) {

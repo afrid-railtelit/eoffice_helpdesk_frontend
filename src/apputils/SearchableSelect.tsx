@@ -47,9 +47,8 @@ function SearchableSelect({
   >(undefined);
 
   useEffect(() => {
-    if (!mainData || mainData?.length !== data?.length) {
-      setMainData(data);
-    }
+    setMainData(data);
+
     if (clear) {
       setInputValue("");
     }
@@ -127,17 +126,23 @@ function SearchableSelect({
         />
         {!clickedInput ? (
           <IoIosArrowDown
-            className={`absolute right-2.5 w-4 h-4 ${error && "top-3"} ${isDisabled &&"text-foreground/30"}   `}
+            className={`absolute right-2.5 w-4 h-4 ${error && "top-3"} ${
+              isDisabled && "text-foreground/30"
+            }   `}
           />
         ) : (
           <MdOutlineKeyboardArrowUp
-            className={`absolute right-2 w-5 h-5   ${error && "top-3"} ${isDisabled &&"text-foreground/30"}`}
+            className={`absolute right-2 w-5 h-5   ${error && "top-3"} ${
+              isDisabled && "text-foreground/30"
+            }`}
           />
         )}
       </div>
 
       <div
-        className={`fixed bg-white mt-1 ${mandatory && "-ml-2"} w-[20vw] border border-gray-300 rounded-md shadow-lg transform transition-all duration-300  origin-top z-[60]  ${
+        className={`fixed bg-white mt-1 ${
+          mandatory && "-ml-2"
+        } w-[20vw] border border-gray-300 rounded-md shadow-lg transform transition-all duration-300  origin-top z-[60]  ${
           clickedInput
             ? "opacity-100 scale-y-100 max-h-60 overflow-y-auto"
             : "opacity-0 scale-y-0 max-h-0 overflow-hidden"

@@ -117,7 +117,6 @@ export function useGetAllEmployees() {
 }
 export function useEditEmployee() {
   const { handleToast } = useHandleApiResponse();
-  const {dispatch} = useAppContext()
 
   const {
     data,
@@ -127,12 +126,6 @@ export function useEditEmployee() {
     mutationFn: (data: any) => editEmployeeAPI(data),
     onSuccess(data) {
         handleToast(data?.data);
-        if(data?.data === "SUCCESS"){
-          dispatch({
-            type:"setRefresh",
-            payload:""
-          })
-        }
     },
     onError() {
       handleToast("ERROR");

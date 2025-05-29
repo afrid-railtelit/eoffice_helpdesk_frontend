@@ -42,9 +42,11 @@ function TicketSubmitDialog({
   const { isPending, updateTicket } = useUpdateTikcetDetails();
   const emailId = useGetEmailId();
   const { dispatch } = useAppContext();
+  const [issueResolution, setIssueResolution] = useState<string>("");
 
   useEffect(() => {
     if (issuesData?.length === 0) getIssuesData();
+    if (!issueResolution) setIssueResolution(issueData?.issueResolution);
   }, []);
 
   function handleSubmitRemarks() {
@@ -53,7 +55,7 @@ function TicketSubmitDialog({
         remarks,
         ticketId,
         emailId,
-        resolve: false,
+        resolve: false
       },
       {
         onSuccess(data) {
@@ -75,6 +77,7 @@ function TicketSubmitDialog({
         ticketId,
         emailId,
         resolve: true,
+        issueResolution
       },
       {
         onSuccess(data) {
@@ -135,10 +138,15 @@ function TicketSubmitDialog({
             </div>
 
             <Textarea
+            disabled={ticketStatus === "RESOLVED"}
               placeholder="Issue resolution"
-              value={issueData?.issueResolution}
+              value={issueResolution}
               className="lg:w-full min-h-32 resize-none pt-3"
               about="Issue resolution"
+              onChange={(e) => {
+                const value = e?.target?.value;
+                setIssueResolution(value);
+              }}
             />
             {ticketStatus !== "RESOLVED" && (
               <Textarea
